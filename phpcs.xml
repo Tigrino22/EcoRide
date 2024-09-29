@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ruleset name="Tigrino Standard" namespace="Tigrino\Framework">
+    <description>
+        Mes régles de code Sniffer
+    </description>
+
+
+    <arg name="colors" />
+    <arg value="p" />
+
+    <file>src/</file>
+    <file>Public/index.php</file>
+    <file>Tests/</file>
+
+    <rule ref="PSR12">
+        <type>Warning</type>
+    </rule>
+
+</ruleset>

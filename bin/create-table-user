@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . "/../src/Core/Misc/utils.php";
+
+use Dotenv\Dotenv;
+use Tigrino\Core\Database\Database;
+
+$dotenv = Dotenv::createUnsafeImmutable(dirname(__DIR__));
+$dotenv->load();
+
+$database = new Database();
+
+try {
+    $database->execute("
+        DROP TABLE IF EXISTS users
+    ");
+    colorLog("La table users a été supprimée ou n'existe pas pour le moment.", "s");
+} catch (Exception $e) {
+    colorLog("Une erreur est survenue : {$e}", "e");
+}
+
+try {
+    colorLog("Création de la table users en cours...", "i");
+    $database->execute("
+        CREATE TABLE users (
+            id CHAR(36) NOT NULL,
+            username VARCHAR(60) NOT NULL,
+            email VARCHAR(150) NOT NULL,
+            password VARCHAR(60) NOT NULL,
+            roles JSON NOT NULL DEFAULT ('[\"user\"]'),
+            session_token VARCHAR(128),
+            is_banned BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            last_login DATETIME,
+            primary key (id),
+            unique (email),
+            unique (username)
+        );
+    ");
+    colorLog("La table users a été créée avec succès.", "s");
+    colorLog("Vous pouvez créer un nouvel utilisateur avec la commande : ", "i");
+    colorLog("./vendor/tigrino-framework/bin/create-user", "i");
+} catch (Exception $e) {
+    colorLog("Une erreur est survenue lors de la création de la table users : {$e}", "e");
+}

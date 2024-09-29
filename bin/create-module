@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Vérifie qu'un nom de module a été fourni
+if [ -z "$1" ]; then
+    echo "Erreur : aucun nom de module fourni."
+    echo "Utilisation : ./bin/create-module nom_du_module"
+    exit 1
+fi
+
+# Récupère le nom du module
+MODULE_NAME="$1"
+MODULE_DIR="src/$MODULE_NAME"
+CONFIG_DIR="$MODULE_DIR/Config"
+CONTROLLER_DIR="$MODULE_DIR/Controller"
+ENTITY_DIR="$MODULE_DIR/Entity"
+REPOSITORY_DIR="$MODULE_DIR/Repository"
+MIDDLEWARE_DIR="$MODULE_DIR/Middleware"
+MODULE_FILE="$MODULE_DIR/${MODULE_NAME}Module.php"
+ROUTES_FILE="$CONFIG_DIR/Routes.php"
+CONTROLLER_FILE="$CONTROLLER_DIR/${MODULE_NAME}Controller.php"
+
+# Crée la structure du module
+mkdir -p "$MODULE_DIR"
+mkdir -p "$CONFIG_DIR"
+mkdir -p "$CONTROLLER_DIR"
+mkdir -p "$ENTITY_DIR"
+mkdir -p "$REPOSITORY_DIR"
+mkdir -p "$MIDDLEWARE_DIR"
+
+# Crée le fichier du module avec l'interface ModuleInterface
+echo "<?php
+
+namespace Tigrino\\$MODULE_NAME;
+
+use Tigrino\\Core\\App;
+use Tigrino\\Core\\Modules\\ModuleInterface;
+
+class ${MODULE_NAME}Module implements ModuleInterface
+{
+
+    private App \$app;
+
+    public function __invoke(App &\$app)
+    {
+        \$this->app = &\$app;
+        \$this->app->getRouter()->addRoutes(include __DIR__ . \"/Config/Routes.php\");
+        // Logique d'initialisation du module
+    }
+}
+" > "$MODULE_FILE"
+
+# Crée le fichier de configuration des routes
+echo "<?php
+
+return [
+    // Définit les routes spécifiques au module
+];
+" > "$ROUTES_FILE"
+
+# Crée le contrôleur
+echo "<?php
+
+namespace Tigrino\\$MODULE_NAME\\Controller;
+
+use Tigrino\\Core\\Controller\\AbstractController;
+use Psr\\Http\\Message\\ResponseInterface;
+use Psr\\Http\\Message\\ServerRequestInterface;
+
+class ${MODULE_NAME}Controller extends AbstractController
+{
+    public function index(): ResponseInterface
+    {
+        // Logique pour la méthode index
+    }
+}
+" > "$CONTROLLER_FILE"
+
+# Prépare l'entrée pour le module
+MODULE_ENTRY="${MODULE_NAME}Module::class"
+
+
+# Récupération du chemin absolu du script puis remontant le dossier parent de bin/
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# Appelle le script PHP pour ajouter le module à ./Config/Modules.php
+php $script_dir/add-module.php "$MODULE_ENTRY" "$MODULE_NAME"
+
+echo "Le module '$MODULE_NAME' a été créé avec succès dans le dossier 'src/$MODULE_NAME'."

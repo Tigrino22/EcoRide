@@ -1,0 +1,37 @@
+{
+    "name": "tigrino/tigrino-framework",
+    "type": "package",
+    "description": "A basic framework who you can set like you want, with CORS, Routes, and Auth",
+    "keywords": ["framework"],
+    "homepage": "https://github.com/Tigrino22/Framework",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Tigrino\\": "src/",
+            "Tests\\": "Tests/",
+            "Config\\": "Config/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tigrino22",
+            "email": "valentin.legris@outlook.com"
+        }
+    ],
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.10",
+        "phpunit/phpunit": "^11.3",
+        "phpunit/php-code-coverage": "^11.0",
+        "php-coveralls/php-coveralls": "^0.4.0"
+    },
+    "require": {
+        "php": ">=8.3.0",
+        "guzzlehttp/psr7": "^2.7",
+        "altorouter/altorouter": "^2.0",
+        "http-interop/response-sender": "^1.0",
+        "relay/relay": "^2.1",
+        "vlucas/phpdotenv": "^5.6",
+        "ramsey/uuid": "^4.7",
+        "filp/whoops": "^2.15"
+    }
+}

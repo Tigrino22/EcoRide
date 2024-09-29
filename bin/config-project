@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Vérifier et créer le dossier Public s'il n'existe pas
+if [ ! -d "Public" ]; then
+    echo "Le dossier Public n'existe pas. Création..."
+    mkdir Public
+fi
+
+# Copier le fichier index.php dans le dossier Public
+cp ./vendor/tigrino/tigrino-framework/Public/index.php Public/
+
+# Vérifier et créer le dossier Config s'il n'existe pas
+if [ ! -d "Config" ]; then
+    echo "Le dossier Config n'existe pas. Création..."
+    mkdir Config
+fi
+
+# Copier tous les fichiers de Config
+cp ./vendor/tigrino/tigrino-framework/Config/* Config/
+
+# Créer le dossier Logs s'il n'existe pas, et ajouter errors.log
+if [ ! -d "Logs" ]; then
+    echo "Le dossier Logs n'existe pas. Création..."
+    mkdir Logs
+fi
+
+# Créer ou toucher le fichier errors.log
+touch Logs/errors.log
+
+# Copier le fichier .env.example en .env
+cp ./vendor/tigrino/tigrino-framework/.env.example .env

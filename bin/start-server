@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Définition de l'adresse et du port
+host="127.0.0.1"
+port=8000
+
+# Récupération du chemin absolu du script puis remontant le dossier parent de bin/
+script_dir=$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")
+
+# Vérifier si le script est exécuté dans le dossier vendor (donc utilisé en tant que dépendance)
+if [[ "$script_dir" == *"/vendor/tigrino/tigrino-framework"* ]]; then
+    # Remonter au dossier racine du projet utilisateur
+    project_root=$(dirname "$(dirname "$(dirname "$script_dir")")")
+    public_dir="$project_root/Public"
+    
+else
+    # Si le script est directement dans le projet
+    public_dir="$script_dir/Public"
+fi
+
+# Vérifier si le répertoire Public existe
+if [ ! -d "$public_dir" ]; then
+    echo -e "\033[31mErreur: le dossier Public n'existe pas.\033[0m"
+    exit 1
+fi
+
+# Démarrage du serveur PHP
+command="php -S $host:$port -t $public_dir"
+echo -e "\033[32mDémarrage du serveur PHP sur http://$host:$port\033[0m"
+echo "Exécution de la commande : $command"
+
+# Exécution de la commande
+$command

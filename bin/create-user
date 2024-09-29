@@ -1,0 +1,62 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Ramsey\Uuid\Uuid;
+use Tigrino\Auth\Repository\UserRepository;
+use Tigrino\Auth\Entity\User;
+use Tigrino\Core\Database\Database;
+
+$dotenv = \Dotenv\Dotenv::createUnsafeImmutable(dirname(__DIR__));
+$dotenv->load();
+
+// Fonction pour masquer l'entrée du mot de passe
+function promptPassword(string $prompt): string
+{
+    echo $prompt;
+    shell_exec('stty -echo'); // Cache l'entrée utilisateur
+    $password = trim(fgets(STDIN));
+    shell_exec('stty echo');  // Affiche à nouveau l'entrée utilisateur
+    echo PHP_EOL;
+    return $password;
+}
+
+// Connexion à la base de données via la classe Database
+$database = new Database();
+
+// Récupération des champs un à un
+echo "Création d'un nouvel utilisateur\n";
+$username = readline('Entrez le nom d\'utilisateur : ');
+$email = readline('Entrez l\'adresse email : ');
+$password = promptPassword('Entrez le mot de passe : ');
+$role = readline('Entrez le rôle : ');
+
+$hashedPass = password_hash($password, PASSWORD_BCRYPT);
+
+// Création de l'utilisateur avec les données fournies
+$user = new User(
+        id: Uuid::uuid4(),
+        username: $username,
+        password: $hashedPass,
+        roles: (array)$role,
+        email: $email
+);
+
+// Sauvegarde de l'utilisateur en base de données
+try {
+    // Démarrage de la transaction
+    $database->beginTransaction();
+
+    // Sauvegarder l'utilisateur avec la méthode save()
+    if ((new UserRepository())->insert($user)) {
+        // Validation de la transaction
+        $database->commit();
+        echo "Utilisateur créé avec succès!\n";
+    } else {
+        throw new \Exception("Échec de la sauvegarde de l'utilisateur.");
+    }
+} catch (\Exception $e) {
+    $database->rollback();
+    echo "Erreur lors de la création de l'utilisateur : " . $e->getMessage() . "\n";
+}

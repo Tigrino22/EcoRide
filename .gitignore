@@ -1,0 +1,21 @@
+.vscode/
+.idea/
+
+# Composer
+/vendor/
+composer.lock
+
+# Cache PHPUnit
+/Tests/phpunit.cache/**/*
+
+# Varibales d'environnement
+.env
+
+# Fichiers de log
+Logs/
+*.log
+/tmp/
+/coverage/
+
+# Perso
+Sql/
