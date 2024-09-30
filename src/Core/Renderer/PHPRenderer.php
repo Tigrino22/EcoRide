@@ -8,6 +8,13 @@ class PHPRenderer implements RendererInteface
     private array $paths = [];
     private array $globals = [];
 
+    public function __construct(?string $defaultPath = null)
+    {
+        if (!is_null($defaultPath)) {
+            $this->addPath($defaultPath);
+        }
+    }
+
     /**
      * Renseigne le chemin des templates
      * possibilité de mettre un namespace pour les templates

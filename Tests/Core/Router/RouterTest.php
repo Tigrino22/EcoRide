@@ -8,9 +8,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Tigrino\Core\Router\Router;
 use Tests\Core\Controllers\TestController;
-use Tigrino\Attaque\AttaqueModule;
 use Tigrino\Auth\AuthModule;
-use Tigrino\Config\Config;
 use Tigrino\Core\App;
 use Tigrino\Http\Response\JsonResponse;
 
@@ -21,7 +19,7 @@ class RouterTest extends TestCase
 
     protected function setUp(): void
     {
-        $dotenv = Dotenv::createUnsafeImmutable(Config::BASE_PATH);
+        $dotenv = Dotenv::createUnsafeImmutable(dirname(__DIR__, 3));
         $dotenv->load();
 
         $this->router = new Router();
