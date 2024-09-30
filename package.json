@@ -1,0 +1,18 @@
+{
+  "name": "ecoride",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild ./assets/ts/app.ts --bundle --outfile=./Public/dist/js/app.js --minify && npx sass --style=compressed ./assets/scss/style.scss ./Public/dist/css/style.css --no-source-map",
+    "dev": "concurrently \"esbuild ./assets/ts/app.ts --bundle --outfile=./Public/dist/js/app.js --minify --watch\" \"npx sass --style=compressed ./assets/scss/style.scss ./Public/dist/css/style.css --no-source-map --watch\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.2"
+  }
+}

@@ -5,6 +5,10 @@
 /vendor/
 composer.lock
 
+# Node
+/node_modules/
+package-lock.json
+
 # Cache PHPUnit
 /Tests/phpunit.cache/**/*
 
