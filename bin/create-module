@@ -9,7 +9,7 @@ fi
 
 # Récupère le nom du module
 MODULE_NAME="$1"
-MODULE_DIR="src/$MODULE_NAME"
+MODULE_DIR="src/App/$MODULE_NAME"
 CONFIG_DIR="$MODULE_DIR/Config"
 CONTROLLER_DIR="$MODULE_DIR/Controller"
 ENTITY_DIR="$MODULE_DIR/Entity"
@@ -19,6 +19,9 @@ MODULE_FILE="$MODULE_DIR/${MODULE_NAME}Module.php"
 ROUTES_FILE="$CONFIG_DIR/Routes.php"
 CONTROLLER_FILE="$CONTROLLER_DIR/${MODULE_NAME}Controller.php"
 
+TEMPLATE_DIR="Templates/$MODULE_NAME"
+TEMPLATE_FILE="$TEMPLATE_DIR/$MODULE_NAME.html.twig"
+
 # Crée la structure du module
 mkdir -p "$MODULE_DIR"
 mkdir -p "$CONFIG_DIR"
@@ -27,24 +30,30 @@ mkdir -p "$ENTITY_DIR"
 mkdir -p "$REPOSITORY_DIR"
 mkdir -p "$MIDDLEWARE_DIR"
 
+mkdir -p "$TEMPLATE_DIR"
+
 # Crée le fichier du module avec l'interface ModuleInterface
 echo "<?php
 
-namespace Tigrino\\$MODULE_NAME;
+namespace Tigrino\\App\\$MODULE_NAME;
 
+use Psr\\Container\\ContainerInterface;
 use Tigrino\\Core\\App;
 use Tigrino\\Core\\Modules\\ModuleInterface;
+use Tigrino\\Core\\Renderer\\RendererInteface;
 
 class ${MODULE_NAME}Module implements ModuleInterface
 {
-
     private App \$app;
 
-    public function __invoke(App &\$app)
+    public function __construct(ContainerInterface \$container)
     {
-        \$this->app = &\$app;
-        \$this->app->getRouter()->addRoutes(include __DIR__ . \"/Config/Routes.php\");
-        // Logique d'initialisation du module
+        \$this->app = \$container->get(App::class);
+        \$this->app->getRouter()->addRoutes(include __DIR__ . '/Config/Routes.php');
+
+        /** @var RendererInteface \$renderer */
+        \$renderer = \$container->get(RendererInteface::class);
+        \$renderer->addPath(dirname(__DIR__, 3) . '/Templates/$MODULE_NAME', '$MODULE_NAME');
     }
 }
 " > "$MODULE_FILE"
@@ -52,28 +61,46 @@ class ${MODULE_NAME}Module implements ModuleInterface
 # Crée le fichier de configuration des routes
 echo "<?php
 
+use Tigrino\\App\\$MODULE_NAME\\Controller\\${MODULE_NAME}Controller;
+
 return [
-    // Définit les routes spécifiques au module
+    [ 'GET', '/$MODULE_NAME', [${MODULE_NAME}Controller::class, 'index'], '$MODULE_NAME', []],
 ];
+
 " > "$ROUTES_FILE"
 
 # Crée le contrôleur
 echo "<?php
 
-namespace Tigrino\\$MODULE_NAME\\Controller;
+namespace Tigrino\\App\\$MODULE_NAME\\Controller;
 
+use GuzzleHttp\\Psr7\\Response;
 use Tigrino\\Core\\Controller\\AbstractController;
 use Psr\\Http\\Message\\ResponseInterface;
-use Psr\\Http\\Message\\ServerRequestInterface;
 
 class ${MODULE_NAME}Controller extends AbstractController
 {
     public function index(): ResponseInterface
     {
-        // Logique pour la méthode index
+          \$content = \$this->render('@$MODULE_NAME/$MODULE_NAME');
+
+          return new Response(
+              200,
+              [],
+              \$content
+          );
     }
 }
 " > "$CONTROLLER_FILE"
+
+# Création du fichier de template
+echo "
+{% extends '@__main__/base.html.twig' %}
+
+{% block body %}
+<h1>Bienvenue sur le module - $MODULE_NAME</h1>
+{% endblock %}
+" > "$TEMPLATE_FILE"
 
 # Prépare l'entrée pour le module
 MODULE_ENTRY="${MODULE_NAME}Module::class"

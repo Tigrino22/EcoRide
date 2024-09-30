@@ -8,7 +8,7 @@ if ($argc !== 3) {
 $moduleEntry = $argv[1];
 $moduleName = $argv[2];
 $configFile = './Config/Modules.php';
-$useEntry = "use Tigrino\\$moduleName\\{$moduleName}Module;";
+$useEntry = "use Tigrino\\App\\$moduleName\\{$moduleName}Module;";
 
 // Vérifie que le fichier de configuration existe
 if (!file_exists($configFile)) {

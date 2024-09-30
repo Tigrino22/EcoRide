@@ -18,6 +18,6 @@ class HomeModule implements ModuleInterface
 
         /** @var RendererInteface $renderer */
         $renderer = $container->get(RendererInteface::class);
-        $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Home', 'home');
+        $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Home', 'Home');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Tigrino\Core;
 
-use DI\Container;
 use Psr\Container\ContainerInterface;
 use Relay\Relay;
 use Config\Config;

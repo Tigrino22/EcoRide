@@ -1,7 +1,7 @@
 <?php
 
-require "../vendor/autoload.php";
-require dirname(__DIR__) . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "Config.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'Config.php';
 
 use Config\Config;
 use Tigrino\Core\App;

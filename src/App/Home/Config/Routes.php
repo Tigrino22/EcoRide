@@ -1,5 +1,7 @@
 <?php
 
+use Tigrino\App\Home\Controller\HomeController;
+
 return [
-    [ "GET", '/', [\Tigrino\App\Home\Controller\HomeController::class, 'index'], 'home', []],
+    [ "GET", '/', [HomeController::class, 'index'], 'Home', []],
 ];
