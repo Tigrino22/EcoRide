@@ -1,5 +1,5 @@
 <?php
 
 return [
-    // Définit les routes spécifiques au module
+    [ "GET", '/', [\Tigrino\App\Home\Controller\HomeController::class, 'index'], 'home', []],
 ];

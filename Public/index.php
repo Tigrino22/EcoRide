@@ -20,7 +20,7 @@ $middlewares = Config::CONFIG_DIR . "/Middlewares.php";
 $modules = Config::CONFIG_DIR . "/Modules.php";
 
 // Initialisation de l'app en passant le tableau de routes en paramètre.
-$app = new App(include($modules));
+$app = new App($container, include($modules));
 
 // Mise en place de Whoops pour l'affiche-age des erreurs
 // en environnement de développement.

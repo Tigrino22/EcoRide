@@ -2,7 +2,8 @@
 
 namespace Tigrino\Core;
 
-use DI\ContainerBuilder;
+use DI\Container;
+use Psr\Container\ContainerInterface;
 use Relay\Relay;
 use Config\Config;
 use Tigrino\Core\Router\Router;
@@ -10,7 +11,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Tigrino\Core\Router\RouterInterface;
 use Tigrino\Core\Modules\ModuleInterface;
-use Tigrino\Auth\Middleware\AuthMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -18,13 +18,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class App
 {
-    /**
-     * routerFactory
-     *
-     * @var Router
-     */
-    private $router;
-
     /**
      * Middlewares de l'application
      *
@@ -38,29 +31,27 @@ class App
      *  @var ModuleInterface[]
      */
     private array $modules = [];
+    private ContainerInterface $container;
 
     /**
      * __construct
      * Prends en paramètre un tableau de modules via un fichier de configuration
      *
      * @param array $modules
-     *
-     * @return void
+     * @param ContainerInterface $container
      */
-    public function __construct(array $modules = [])
+    public function __construct(ContainerInterface $container, array $modules = [])
     {
-        $this->router = new Router();
+        $this->container = $container;
 
         // Ajout des routes générales. CONFIG_DIR = ./Config/**
-        $this->router->addRoutes(include(Config::CONFIG_DIR . "Routes.php"));
+        $this->container->get(Router::class)->addRoutes(include(Config::CONFIG_DIR . "Routes.php"));
 
         /**
-         * Initialisation de chaque module
-         * en passant par la méthode __invocke?
+         * Initialisation de chaque module avec le container
          */
         foreach ($modules as $module) {
-            $this->modules[] = new $module();
-            end($this->modules)($this);
+            $this->modules[] = $this->container->get($module);
         }
     }
 
@@ -97,7 +88,7 @@ class App
     {
         // Last middleware pour géré le routing
         $this->addMiddleware(function ($request, $handler) {
-            return $this->router->dispatch($request);
+            return $this->container->get(Router::class)->dispatch($request);
         });
 
         // Execution de la pile de middleware.
@@ -114,7 +105,7 @@ class App
      */
     public function getRouter(): RouterInterface
     {
-        return $this->router;
+        return $this->container->get(Router::class);
     }
 
     public function getModules(): array

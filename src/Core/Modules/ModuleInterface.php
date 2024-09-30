@@ -2,7 +2,7 @@
 
 namespace Tigrino\Core\Modules;
 
-use Tigrino\Core\App;
+use Psr\Container\ContainerInterface;
 
 interface ModuleInterface
 {
@@ -11,5 +11,5 @@ interface ModuleInterface
      * nécessaire afin d'initialiser le module en question.
      *
      */
-    public function __invoke(App &$app);
+    public function __construct(ContainerInterface $container);
 }

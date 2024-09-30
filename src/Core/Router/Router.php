@@ -4,6 +4,7 @@ namespace Tigrino\Core\Router;
 
 use AltoRouter;
 use GuzzleHttp\Psr7\Response;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 use Tigrino\Core\Controller\AbstractController;
@@ -43,12 +44,14 @@ class Router implements RouterInterface
      * @var string[]
      */
     private $protectedRoutes = [];
+    private $container;
 
     /**
      * Initialise l'instance d'AltoRouter lors de la création du Router.
      */
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
         $this->router = new AltoRouter();
     }
 
@@ -120,7 +123,7 @@ class Router implements RouterInterface
                 $params = $route['params'];
 
                 if (class_exists($controller) && is_subclass_of($controller, AbstractController::class)) {
-                    $controllerInstance = new $controller();
+                    $controllerInstance = $this->container->get($controller);
                     return $controllerInstance->execute($method, $params, $request);
                 } else {
                     throw new ControllerException(

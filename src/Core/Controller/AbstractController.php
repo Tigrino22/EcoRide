@@ -2,10 +2,11 @@
 
 namespace Tigrino\Core\Controller;
 
-use GuzzleHttp\Psr7\ServerRequest;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tigrino\Core\Renderer\RendererInteface;
 
 abstract class AbstractController
 {
@@ -13,7 +14,34 @@ abstract class AbstractController
      * @var RequestInterface|ServerRequestInterface
      */
     protected RequestInterface|ServerRequestInterface $request;
+    /**
+     * @var ContainerInterface
+     */
+    protected ContainerInterface $container;
+    private RendererInteface $renderer;
 
+    /**
+     * Constructeur de base pour injecter le container.
+     *
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+        $this->renderer = $this->container->get(RendererInteface::class);
+    }
+
+    /**
+     * Méthode de rendu directement implémenter dans le controller
+     *
+     * @param string $view
+     * @param array $params
+     * @return string
+     */
+    protected function render(string $view, array $params = []): string
+    {
+        return $this->renderer->render($view, $params);
+    }
     /**
      * Exécute la méthode demandée avec les paramètres et la requête.
      *

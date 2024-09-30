@@ -1,9 +1,16 @@
 <?php
 
-use Tigrino\Core\Renderer\PHPRenderer;
+use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\TwigRendererFactory;
+use Tigrino\Core\Router\Router;
+
+use function DI\autowire;
+use function DI\factory;
 
 return [
-    PHPRenderer::class => function () {
-        return new PHPRenderer();
-    }
+    'templates.path' => dirname(__DIR__) . '/Templates',
+    'modules' => include(__DIR__ . '/Modules.php'),
+
+    RendererInteface::class => factory(TwigRendererFactory::class),
+    Router::class => autowire(Router::class),
 ];
