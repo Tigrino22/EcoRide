@@ -2,6 +2,7 @@
 
 namespace Tigrino\Core;
 
+use DI\ContainerBuilder;
 use Relay\Relay;
 use Config\Config;
 use Tigrino\Core\Router\Router;
