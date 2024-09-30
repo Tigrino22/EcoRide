@@ -2,7 +2,7 @@
 
 namespace Tests\Modules;
 
-use Tigrino\Core\App;
+use Psr\Container\ContainerInterface;
 use Tigrino\Core\Modules\ModuleInterface;
 
 class TestModules implements ModuleInterface
@@ -12,7 +12,7 @@ class TestModules implements ModuleInterface
     /**
      * @inheritDoc
      */
-    public function __invoke(App &$app): void
+    public function __construct(ContainerInterface $container)
     {
         $this->message = "Ce module a été activé";
     }

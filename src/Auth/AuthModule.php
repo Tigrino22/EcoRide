@@ -2,9 +2,12 @@
 
 namespace Tigrino\Auth;
 
+use Psr\Container\ContainerInterface;
 use Tigrino\Auth\Middleware\AuthMiddleware;
 use Tigrino\Core\App;
 use Tigrino\Core\Modules\ModuleInterface;
+use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Router\Router;
 use Tigrino\Core\Router\RouterInterface;
 
 class AuthModule implements ModuleInterface
@@ -18,6 +21,7 @@ class AuthModule implements ModuleInterface
      * @var RouterInterface
      */
     private $router;
+    private ContainerInterface $container;
 
     /**
      * Méthode a implémenter en fonction du fonctionnement
@@ -26,20 +30,17 @@ class AuthModule implements ModuleInterface
      * @param App $app
      * @return void
      */
-    public function __invoke(App &$app): void
+    public function __construct(ContainerInterface $container)
     {
-        $this->app = &$app;
-        /** @var RouterInterface */
-        $this->router = $this->app->getRouter();
-
-        $this->router->addRoutes(include __DIR__ . "/Config/Routes.php");
+        $this->container = $container;
+        $this->app = $container->get(App::class);
+        $this->app->getRouter()->addRoutes(include __DIR__ . "/Config/Routes.php");
 
         $this->addAuthMiddleware();
     }
 
-    private function addAuthMiddleware()
+    private function addAuthMiddleware(): void
     {
-        $protectedRoutes = $this->router->getProtectedRoutes();
-        $this->app->addMiddleware(new AuthMiddleware($this->router));
+        $this->app->addMiddleware(new AuthMiddleware($this->container->get(Router::class)));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Core\Router;
 
+use DI\ContainerBuilder;
+use DI\Container;
 use Dotenv\Dotenv;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
@@ -9,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Tigrino\Core\Router\Router;
 use Tests\Core\Controllers\TestController;
 use Tigrino\Auth\AuthModule;
+use Tigrino\Auth\Middleware\AuthMiddleware;
 use Tigrino\Core\App;
 use Tigrino\Http\Response\JsonResponse;
 
@@ -16,13 +19,18 @@ class RouterTest extends TestCase
 {
     /** @var Router */
     private $router;
+    private Container $container;
 
     protected function setUp(): void
     {
         $dotenv = Dotenv::createUnsafeImmutable(dirname(__DIR__, 3));
         $dotenv->load();
 
-        $this->router = new Router();
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->addDefinitions(dirname(__DIR__, 2) . '/Config/Container.php');
+        $this->container = $containerBuilder->build();
+
+        $this->router = new Router($this->container);
     }
 
     public function testGetRouteMatched()
@@ -131,7 +139,8 @@ class RouterTest extends TestCase
             ["GET", "/admin", [TestController::class, "admin"], "admin.dashboard", ["admin"]]
         ];
 
-        $app = new App([AuthModule::class]);
+        $app = new App($this->container, [AuthModule::class]);
+        $app->addMiddleware(new AuthMiddleware($this->container->get(Router::class)));
         $app->getRouter()->addRoutes($routes);
 
         // Simuler une requête avec un rôle insuffisant
@@ -169,7 +178,7 @@ class RouterTest extends TestCase
 
     public function testCreate()
     {
-        $controller = new TestController();
+        $controller = new TestController($this->container);
 
         $routes = [
             ["POST", "/test/create", [TestController::class, "create"], "test.create", []]

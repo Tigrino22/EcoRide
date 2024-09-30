@@ -115,7 +115,7 @@ class Router implements RouterInterface
      */
     public function dispatch(RequestInterface $request): ResponseInterface
     {
-        $route = $this->match($request->getMethod(), (string) $request->getUri()->getPath());
+        $route = $this->match($request->getMethod(), $request->getUri()->getPath());
 
         if ($route) {
             if (is_array($route['target'])) {

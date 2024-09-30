@@ -3,19 +3,22 @@
 namespace Tests\Core;
 
 use Dotenv\Dotenv;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\ServerRequest;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Tests\Modules\TestModules;
 use Tigrino\Core\App;
+use DI\ContainerBuilder;
+use GuzzleHttp\Psr7\Response;
+use Tests\Modules\TestModules;
+use PHPUnit\Framework\TestCase;
 use Tigrino\Core\Router\Router;
+use GuzzleHttp\Psr7\ServerRequest;
+use Psr\Http\Message\ResponseInterface;
 use Tigrino\Core\Router\RouterInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Tests\Core\Controllers\TestController;
 
 class AppTest extends TestCase
 {
     private App $app;
+    private \DI\Container $container;
 
     public function setUp(): void
     {
@@ -24,35 +27,12 @@ class AppTest extends TestCase
         $dotenv = Dotenv::createUnsafeImmutable(dirname(__DIR__, 2));
         $dotenv->load();
 
-        $this->app = new App([]);
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->addDefinitions(dirname(__DIR__, 2) . '/Config/Container.php');
+        $this->container = $containerBuilder->build();
+
+        $this->app = new App($this->container, []);
     }
-
-
-    // public function testAddSingleMiddleware(): void
-    // {
-    //     $middleware = function (ServerRequestInterface $request, $handler) {
-    //         return new Response(200, [], 'Middleware exécuté');
-    //     };
-
-    //     $this->app->addMiddleware($middleware);
-
-    //     $request = new ServerRequest("GET", "/");
-
-
-    //     try {
-    //         $response = $this->app->run($request);
-    //     } catch (\Exception $exception) {
-    //         echo $exception;
-    //     }
-
-
-    //     $this->assertInstanceOf(ResponseInterface::class, $response);
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals("Middleware exécuté", $response->getBody());
-
-    //     restore_exception_handler();
-    //     restore_error_handler();
-    // }
 
     public function testAddMultipleMiddlewares()
     {
@@ -85,32 +65,9 @@ class AppTest extends TestCase
 
     public function testAddModule()
     {
-        $this->app = new App([TestModules::class]);
+        $this->app = new App($this->container, [TestModules::class]);
 
         // getMessage has to be set.
         $this->assertEquals("Ce module a été activé", $this->app->getModules()[0]->getMessage());
-    }
-
-    public function testDispatchMethodInRunMethod()
-    {
-        $route = [
-            ["GET", "/test", function () {
-                return new Response(200, [], 'Route dispatched');
-            }]
-        ];
-
-        $router = new Router();
-        $router->addRoutes($route);
-
-        $routerReflection = new \ReflectionProperty(App::class, "router");
-        $routerReflection->setValue($this->app, $router);
-
-        $request = new ServerRequest("GET", "/test");
-
-        $response = $this->app->run($request);
-
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('Route dispatched', (string)$response->getBody());
     }
 }

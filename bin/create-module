@@ -7,6 +7,11 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+lcfirst() {
+  local str="$1"
+  echo "$(echo "${str:0:1}" | tr 'A-Z' 'a-z')${str:1}"
+}
+
 # Récupère le nom du module
 MODULE_NAME="$1"
 MODULE_DIR="src/App/$MODULE_NAME"
@@ -64,7 +69,7 @@ echo "<?php
 use Tigrino\\App\\$MODULE_NAME\\Controller\\${MODULE_NAME}Controller;
 
 return [
-    [ 'GET', '/$MODULE_NAME', [${MODULE_NAME}Controller::class, 'index'], '$MODULE_NAME', []],
+    [ 'GET', '/$(lcfirst "$MODULE_NAME")', [${MODULE_NAME}Controller::class, 'index'], '$MODULE_NAME', []],
 ];
 
 " > "$ROUTES_FILE"

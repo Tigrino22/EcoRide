@@ -2,6 +2,7 @@
 
 namespace Tigrino\Tests\Core\Controllers;
 
+use DI\ContainerBuilder;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
@@ -9,10 +10,18 @@ use Tests\Core\Controllers\TestController;
 
 class AbstractControllerTest extends TestCase
 {
+    private \DI\Container $container;
+
+    public function setUp(): void
+    {
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->addDefinitions(dirname(__DIR__, 2) . '/Config/Container.php');
+        $this->container = $containerBuilder->build();
+    }
     public function testExecuteMethodExists()
     {
         // Instanciation de la classe concrète
-        $controller = new TestController();
+        $controller = new TestController($this->container);
 
         // Création d'une fausse requête ServerRequest
         $request = new ServerRequest('GET', '/test');
@@ -33,7 +42,7 @@ class AbstractControllerTest extends TestCase
     public function testExecuteMethodNotFound()
     {
         // Instanciation de la classe concrète
-        $controller = new TestController();
+        $controller = new TestController($this->container);
 
         // Création d'une fausse requête ServerRequest
         $request = new ServerRequest('GET', '/test');

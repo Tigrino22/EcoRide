@@ -2,6 +2,7 @@
 
 namespace Tigrino\Core\Database;
 
+use Dotenv\Dotenv;
 use PDO;
 use PDOException;
 use Tigrino\Core\Database\DatabaseInterface;
