@@ -1,0 +1,11 @@
+{
+  "assets/ts/main.ts": {
+    "file": "main-BYmjM-aQ.js",
+    "name": "main",
+    "src": "assets/ts/main.ts",
+    "isEntry": true,
+    "css": [
+      "main-CrJmAl_S.css"
+    ]
+  }
+}

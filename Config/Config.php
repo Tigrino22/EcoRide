@@ -23,7 +23,7 @@ class Config
     public static function load()
     {
         // Chargement des variables d'environnement
-        $dotenv = Dotenv::createUnsafeImmutable(self::BASE_PATH);
+        $dotenv = Dotenv::createImmutable(self::BASE_PATH);
         $dotenv->load();
 
         // Enregistrement du ErrorHandler pour la capture des erreurs
@@ -41,11 +41,14 @@ class Config
     private static function setContainer(): void
     {
         $containerBuilder = new ContainerBuilder();
-        $containerBuilder->addDefinitions(__DIR__ . DIRECTORY_SEPARATOR . 'Container.php');
+        $containerBuilder->addDefinitions(self::CONFIG_DIR . 'Container.php');
         try {
             self::$container = $containerBuilder->build();
+        } catch (DependencyException $e) {
+            throw new DependencyException("Container dependency error: " . $e->getMessage());
         } catch (Exception $e) {
-            throw new DependencyException("Container wasn't initialized");
+            throw new Exception("Error initializing container: " . $e->getMessage());
         }
     }
+
 }
