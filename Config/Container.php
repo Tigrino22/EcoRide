@@ -1,12 +1,13 @@
 <?php
 
-use Tigrino\Core\Renderer\RendererInteface;
-use Tigrino\Core\Renderer\TwigRendererFactory;
-use Tigrino\Core\Router\Router;
-
-use function DI\autowire;
 use function DI\env;
 use function DI\factory;
+use function DI\autowire;
+
+use Tigrino\Core\Router\Router;
+use Tigrino\Auth\Controller\AuthController;
+use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\TwigRendererFactory;
 
 return [
     'templates.path' => dirname(__DIR__) . '/Templates', // Pour le namespace __main__ twig
@@ -16,4 +17,5 @@ return [
 
     RendererInteface::class => factory(TwigRendererFactory::class),
     Router::class => autowire(Router::class),
+    AuthController::class => autowire(),
 ];

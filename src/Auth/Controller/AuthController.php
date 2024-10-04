@@ -3,6 +3,7 @@
 namespace Tigrino\Auth\Controller;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\Uuid;
 use Tigrino\Auth\Entity\User;
@@ -14,8 +15,9 @@ class AuthController extends AbstractController
 {
     private UserRepository $userRepository;
 
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
+        parent::__construct($container);
         $this->userRepository = new UserRepository();
     }
 
@@ -57,10 +59,12 @@ class AuthController extends AbstractController
                 ]
             );
         }
+        $content = $this->render('@Auth/register');
 
         return new Response(
-            status: 200,
-            body: "<h1>Page d'inscription</h1>"
+            200,
+            [],
+            $content
         );
     }
 
@@ -105,9 +109,12 @@ class AuthController extends AbstractController
             );
         }
 
+        $content = $this->render('@Auth/login');
+
         return new Response(
-            status: 200,
-            body: "<h1>Page de connexion</h1>"
+            200,
+            [],
+            $content
         );
     }
 

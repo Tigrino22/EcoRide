@@ -32,15 +32,18 @@ class AuthModule implements ModuleInterface
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
         $this->app = $container->get(App::class);
         $this->app->getRouter()->addRoutes(include __DIR__ . "/Config/Routes.php");
 
-        $this->addAuthMiddleware();
+        /** @var RendererInteface $renderer */
+        $renderer = $container->get(RendererInteface::class);
+        $renderer->addPath(dirname(__DIR__, 2) . '/Templates/Auth', 'Auth');
+
+        $this->addAuthMiddleware($container);
     }
 
-    private function addAuthMiddleware(): void
+    private function addAuthMiddleware($container): void
     {
-        $this->app->addMiddleware(new AuthMiddleware($this->container->get(Router::class)));
+        $this->app->addMiddleware(new AuthMiddleware($container->get(Router::class)));
     }
 }

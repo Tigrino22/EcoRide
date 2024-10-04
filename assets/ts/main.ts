@@ -1,5 +1,9 @@
 import '../css/main.css';
 
-// TODO
+import 'flowbite';
+import { initFlowbite } from 'flowbite'
 
+window.addEventListener('DOMContentLoaded', () => {
+    initFlowbite();
+});
 

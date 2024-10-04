@@ -23,7 +23,7 @@ class Config
     public static function load()
     {
         // Chargement des variables d'environnement
-        $dotenv = Dotenv::createImmutable(self::BASE_PATH);
+        $dotenv = Dotenv::createUnsafeImmutable(self::BASE_PATH);
         $dotenv->load();
 
         // Enregistrement du ErrorHandler pour la capture des erreurs

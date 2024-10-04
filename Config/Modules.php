@@ -5,9 +5,10 @@
  */
 
 
+use Tigrino\Auth\AuthModule;
 use Tigrino\App\Home\HomeModule;
 
 return [
     HomeModule::class,
-    //AuthModule::class,
+    AuthModule::class,
 ];
