@@ -17,11 +17,12 @@ class TwigRenderer implements RendererInteface
      */
     private FilesystemLoader $loader;
 
-    public function __construct(string $path, string $assetPath, string $env)
+    public function __construct(string $path, string $assetPath, string $env, $container)
     {
         $this->loader = new FilesystemLoader($path);
         $this->twig = new Environment($this->loader);
         $this->twig->addExtension(new TwigAssetsExtension($assetPath, $env));
+        $this->twig->addExtension(new TwigPathExtension($container));
     }
 
     /**

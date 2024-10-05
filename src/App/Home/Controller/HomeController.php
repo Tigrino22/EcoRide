@@ -10,7 +10,18 @@ class HomeController extends AbstractController
 {
     public function index(): ResponseInterface
     {
-        $content = $this->render('@Home/Home');
+        $content = $this->render('@Home/home');
+
+        return new Response(
+            200,
+            [],
+            $content
+        );
+    }
+
+    public function contact(): ResponseInterface
+    {
+        $content = $this->render('@Home/contact');
 
         return new Response(
             200,

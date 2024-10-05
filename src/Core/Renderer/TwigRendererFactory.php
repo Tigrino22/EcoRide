@@ -17,7 +17,8 @@ class TwigRendererFactory
         return new TwigRenderer(
             $container->get('templates.path'),
             $container->get('asset.path'),
-            $container->get('environnement')
+            $container->get('environnement'),
+            $container
         );
     }
 }

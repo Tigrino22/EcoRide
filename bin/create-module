@@ -69,7 +69,7 @@ echo "<?php
 use Tigrino\\App\\$MODULE_NAME\\Controller\\${MODULE_NAME}Controller;
 
 return [
-    [ 'GET', '/$(lcfirst "$MODULE_NAME")', [${MODULE_NAME}Controller::class, 'index'], '$MODULE_NAME', []],
+    [ 'GET', '/$(lcfirst "$MODULE_NAME")', [${MODULE_NAME}Controller::class, 'index'], '$(lcfirst "$MODULE_NAME")', []],
 ];
 
 " > "$ROUTES_FILE"
