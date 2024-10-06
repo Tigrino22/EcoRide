@@ -1,0 +1,12 @@
+{% if search %}
+
+    <div class="flex flex-wrap justify-center gap-6">
+        {% for i in 0..10 %}
+
+            {% include '@Covoiturage/components/card.html.twig' %}
+
+        {% endfor %}
+    </div>
+
+
+{% endif %}
