@@ -21,8 +21,12 @@ class TwigRenderer implements RendererInteface
     {
         $this->loader = new FilesystemLoader($path);
         $this->twig = new Environment($this->loader);
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            $this->addGlobals('session', $_SESSION);
+        }
         $this->twig->addExtension(new TwigAssetsExtension($assetPath, $env));
         $this->twig->addExtension(new TwigPathExtension($container));
+        $this->twig->addExtension(new TwigSessionExtension());
     }
 
     /**

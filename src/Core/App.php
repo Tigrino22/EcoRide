@@ -50,7 +50,7 @@ class App
          * Initialisation de chaque module avec le container
          */
         foreach ($modules as $module) {
-            $this->modules[] = $this->container->get($module);
+            $this->modules[] = new $module($this, $this->container);
         }
     }
 

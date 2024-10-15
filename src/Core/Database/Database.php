@@ -10,26 +10,38 @@ use Tigrino\Core\Database\DatabaseInterface;
 class Database implements DatabaseInterface
 {
     private PDO $pdo;
-    public function __construct()
+    public function __construct($dbType = 'mysql')
     {
-        // Récupération les informations de connexion depuis les variables d'environnement
-        $host = getenv('DB_HOST');
-        $dbname = getenv('DB_NAME');
-        $user = getenv('DB_USER');
-        $password = getenv('DB_PASSWORD');
-        $port = getenv('DB_PORT') ?: 3306;
 
-        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4;port=$port";
+        if ($dbType === 'sqlite') {
+            try {
+                // SQLite pour les tests
+                $dbPath = dirname(__DIR__, 3) . '/Tests/sqlite_test.db';
+                $this->pdo = new \PDO('sqlite:' . $dbPath);
+            } catch (PDOException $e) {
+                echo "Impossible d'init sqlite pour les tests : " . $e->getMessage();
+            }
+        } else {
+            // Récupération les informations de connexion depuis les variables d'environnement
+            $host = getenv('DB_HOST');
+            $dbname = getenv('DB_NAME');
+            $user = getenv('DB_USER');
+            $password = getenv('DB_PASSWORD');
+            $port = getenv('DB_PORT') ?: 3306;
 
-        try {
-            $this->pdo = new PDO($dsn, $user, $password, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ]);
-        } catch (PDOException $e) {
-            throw new \RuntimeException("Erreur de connexion à la base de données : " . $e->getMessage());
+            $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4;port=$port";
+
+            try {
+                $this->pdo = new PDO($dsn, $user, $password);
+            } catch (PDOException $e) {
+                echo "Erreur de connexion à la base de données : " . $e->getMessage();
+            }
         }
+
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
     }
 
     /**

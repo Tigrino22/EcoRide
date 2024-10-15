@@ -14,8 +14,9 @@
             </p>
 
             <p class="max-w-3xl text-3xl lg:text-4xl mx-auto mt-6 text-center text-gray-700 dark:text-white">
-                Venez covoiturez !
+                Venez covoiturez avec nous {{ session('user').firstname }}!
             </p>
+            <p>{% include '@Auth/user.html.twig' %}</p>
 
             <div class="flex-col flex my-8 mx-6 md:flex-row md:justify-center space-y-2 md:space-y-0 md:space-x-2">
                 <input id="start" type="text" 

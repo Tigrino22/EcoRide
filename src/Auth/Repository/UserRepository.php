@@ -2,58 +2,53 @@
 
 namespace Tigrino\Auth\Repository;
 
+use Exception;
 use Ramsey\Uuid\Uuid;
+use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Core\Database\Database;
 
 class UserRepository
 {
-    public $id;
-    public $username;
-    public $email;
+    protected Database $db;
 
-    private Database $db;
-
-    public function __construct()
+    public function __construct(Database $db = null)
     {
-        $this->db = new Database(); // Connexion via la classe Database
+        $this->db = $db ?? new Database();
     }
 
-    public function insert(User $user): bool
+    public function insert(User $user): ?User
     {
-            // Insertion d'un nouvel utilisateur
-            $query = 'INSERT INTO users 
-                (id, username, email, password, roles) 
-                VALUES (:id, :username, :email, :password, :roles)';
-            $params = [
-                ':id' => $user->getUuid(),
-                ':username' => $user->getUsername(),
-                ':email' => $user->getEmail(),
-                ':password' => $user->getPassword(),
-                ':roles' => json_encode($user->getRoles())
-            ];
-            return $this->db->execute($query, $params);
+        // Insertion d'un nouvel utilisateur
+        $query = 'INSERT INTO users 
+            (id, username, email, password) 
+            VALUES (:id, :username, :email, :password)';
+        $params = [
+            ':id' => $user->getUuid()->getBytes(),
+            ':username' => $user->getUsername(),
+            ':email' => $user->getEmail(),
+            ':password' => $user->getPassword(),
+        ];
+
+        return $this->flush($user, $query, $params);
     }
 
-    public function update(User $user): bool
+    public function update(User $user): ?User
     {
-            // Mise à jour de l'utilisateur
-            $query = 'UPDATE users SET 
-                username = :username,
-                email = :email,
-                roles = :roles,
-                session_token = :session_token,
-                last_login = :last_login
-                WHERE id = :id';
-            $params = [
-                ':id' => $user->getUuid(),
-                ':username' => $user->getUsername(),
-                ':email' => $user->getEmail(),
-                ':roles' => json_encode($user->getRoles()),
-                ':session_token' => $user->getSessionToken(),
-                ':last_login' => $user->getLastLogin()
-            ];
-            return $this->db->execute($query, $params);
+        // Mise à jour de l'utilisateur
+        $query = 'UPDATE users SET 
+            username = :username,
+            email = :email,
+            last_login = :last_login
+            WHERE id = :id';
+        $params = [
+            ':id' => $user->getUuid()->getBytes(),
+            ':username' => $user->getUsername(),
+            ':email' => $user->getEmail(),
+            ':last_login' => $user->getLastLogin()
+        ];
+
+        return $this->flush($user, $query, $params);
     }
 
     public function findByEmail(string $email): ?User
@@ -63,7 +58,7 @@ class UserRepository
 
         $result = $this->db->query($query, $params);
         if ($result) {
-            return self::mapDataToUser($result[0]);
+            return $this->mapDataToUser($result[0]);
         }
 
         return null;
@@ -76,23 +71,127 @@ class UserRepository
 
         $result = $this->db->query($query, $params);
         if ($result) {
-            return self::mapDataToUser($result[0]);
+            return $this->mapDataToUser($result[0]);
         }
 
         return null;
     }
 
-    public function findBySessionToken(string $token): ?User
+    public function findById(Uuid $id): ?User
     {
-        $query = 'SELECT * FROM users WHERE session_token = :token LIMIT 1';
-        $params = [':token' => $token];
+        $query = 'SELECT * FROM users WHERE id = :id';
+        $params = [':id' => $id->getBytes()];
 
         $result = $this->db->query($query, $params);
         if ($result) {
-            return self::mapDataToUser($result[0]);
+            return $this->mapDataToUser($result[0]);
         }
 
         return null;
+    }
+
+    /**
+     * Modifie la liste des roles actuelle de
+     * l'utilisateur vers une nouvelle liste
+     * @param User $user
+     * @param array $roles
+     * @return bool|User
+     * @throws Exception
+     */
+    public function setRole(User $user, array $roles): bool|User
+    {
+        // Récupérer l'utilisateur
+        $user_id = $user->getUuid()->getBytes();
+
+        // Delete existing roles for the user to avoid duplicates
+        $deleteQuery = '
+                        DELETE FROM users_roles 
+                        WHERE user_id = :user_id
+                    ';
+        $this->db->execute($deleteQuery, [':user_id' => $user_id]);
+
+        // Prepare insert statement
+        $insertQuery = '
+                        INSERT INTO users_roles (user_id, role_id) 
+                        VALUES (:user_id, :role_id)
+                    ';
+
+        // Tableau de int intermediaire pour user->setRole
+        $array_to_set_user = [];
+
+        try {
+            $this->db->beginTransaction();
+
+            foreach ($roles as $roleNumber) {
+                // Get the role ID from the roles table based on the role number
+                $roleResult = $this->db->query(
+                    'SELECT id, number FROM roles WHERE number = :number',
+                    [':number' => $roleNumber]
+                );
+
+                if (empty($roleResult)) {
+                    throw new Exception("Aucun rôle n'a été trouvé avec le code : $roleNumber");
+                }
+
+                $roleId = $roleResult[0]['id'];
+
+                $array_to_set_user[] = $roleResult[0]['number'];
+
+                $params = [
+                    ':user_id' => $user_id,
+                    ':role_id' => $roleId
+                ];
+
+                $this->db->execute($insertQuery, $params);
+            }
+
+            $this->db->commit();
+
+            $user->setRoles($array_to_set_user);
+
+            return $user;
+        } catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * @param User $user
+     * @return array|int
+     */
+    public function getRoles(User $user): array|int
+    {
+
+        // Si l'utilisateur est un invité
+        // on ne va pas plus loin
+        if ($user->getUsername() === 'GUEST') {
+            return [Role::GUEST];
+        }
+
+        $userId = $user->getUuid()->getBytes();
+
+        // Récupération de tous les rôles de la table roles
+        $query = "
+                    SELECT r.id, r.name, r.number 
+                    FROM roles r
+                    JOIN users_roles ur ON ur.role_id = r.id
+                    WHERE ur.user_id = :user_id
+              ";
+
+        $rolesData = $this->db->query($query, [':user_id' => $userId]);
+
+        $roles = [];
+
+        foreach ($rolesData as $role) {
+            $roles[] = (int)$role['number'];
+        }
+
+        if (empty($roles)) {
+            $roles[] = Role::GUEST;
+        }
+
+        return $roles;
     }
 
     /**
@@ -103,16 +202,40 @@ class UserRepository
      * @param array $data
      * @return User
      */
-    private static function mapDataToUser(array $data): User
+    private function mapDataToUser(array $data): User
     {
-        return new User(
-            id: $data['id'],
+        $user =  new User(
             username: $data['username'],
             password: $data['password'],
-            roles: json_decode($data['roles'], true),  // on decode les roles en tableau
             email: $data['email'],
-            sessionToken: $data['session_token'],
             lastLogin: $data['last_login']
         );
+
+        $user->setUuid(Uuid::fromBytes($data['id']));
+        $user->setRoles($this->getRoles($user));
+
+        return $user;
+    }
+
+    /**
+     * @param User $user
+     * @param string $query
+     * @param array $params
+     * @return User|null
+     */
+    protected function flush(User $user, string $query, array $params): ?User
+    {
+        try {
+            // Enregistrement des rôles.
+            $this->db->execute($query, $params);
+
+            $this->setRole($user, $user->getRoles());
+
+            return $user;
+        } catch (Exception $exception) {
+            echo "Erreur lors de l'insertion ou de l'update de l'user : {$exception->getMessage()}";
+
+            return false;
+        }
     }
 }

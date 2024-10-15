@@ -3,26 +3,37 @@
 namespace Tigrino\Auth\Middleware;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Tigrino\App\Ecoride\Entity\UserEcoride;
+use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
+use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\GuestUser;
 use Tigrino\Auth\Entity\User;
+use Tigrino\Auth\Entity\UserInterface;
 use Tigrino\Auth\Repository\UserRepository;
-use Tigrino\Core\Router\RouterInterface;
+use Tigrino\Core\Router\Router;
+use Tigrino\Core\Session\SessionManager;
+use Tigrino\Core\Session\SessionManagerInterface;
+use Tigrino\Http\Errors\ForbiddenResponse;
+use Tigrino\Http\Response\RedirectResponse;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    private $protectedRoutes = [];
-    private $router;
-    private UserRepository $userRepository;
-    private User $user;
+    private Router $router;
+    private UserEcorideRepository $userRepository;
+    private SessionManagerInterface $sessionManager;
+    private ContainerInterface $container;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(ContainerInterface $container, UserRepository $userRepository = null)
     {
-        $this->router = $router;
-        $this->userRepository = new UserRepository();
+        $this->container = $container;
+        $this->router = $this->container->get(Router::class);
+        $this->userRepository = $userRepository ?? new UserEcorideRepository();
+        $this->sessionManager = $container->get(SessionManager::class);
     }
 
     /**
@@ -32,13 +43,12 @@ class AuthMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-
         // Obtenir le chemin et la méthode HTTP
         $path = $request->getUri()->getPath();
         $method = $request->getMethod();
 
         // obtention des routes protégées
-        $this->protectedRoutes = $this->router->getProtectedRoutes();
+        $protectedRoutes = $this->router->getProtectedRoutes();
 
         // Match pour trouver une route qui correspond a la requête
         $match = $this->router->match($method, $path);
@@ -46,27 +56,52 @@ class AuthMiddleware implements MiddlewareInterface
         // Si une route est trouvée
         if ($match) {
             // Vérifier si cette route est protégée
-            foreach ($this->protectedRoutes as $protectedRoute) {
+            foreach ($protectedRoutes as $protectedRoute) {
                 if ($match['name'] === $protectedRoute['name']) {
                     $requiredRoles = $protectedRoute['role'];
 
                     /**
-                    * Si nous avons un session_token c'est que l'utilisateur est authentifié.
-                    */
-                    if (isset($request->getCookieParams()['session_token'])) {
-                        $user = $this->userRepository->findBySessionToken($request->getCookieParams()['session_token']);
+                     * Recherche de l'utilisateur par l'id dans la session
+                     */
+                    if ($this->sessionManager->has('user')) {
+                        $id = $this->sessionManager->get('user')['id'];
+                        try {
+
+                            /** @var UserEcoride $user */
+                            $user = $this->userRepository->findById($id);
+                        } catch (\Exception $e) {
+                            echo "L'utilisateur n'a pas pu être retrouver : $id | Message : " . $e->getMessage();
+                        }
                     } else {
                         $user = new GuestUser();
                     }
 
                     // Vérifier si l'utilisateur a les rôles requis
-                    if (count($requiredRoles) > 0 && !array_intersect($user->getRoles(), $requiredRoles)) {
-                        return new Response(403, [], "<h1>Accès interdit</h1>");
+                    if (count($requiredRoles) > 0 && !$this->hasRole($user, $requiredRoles)) {
+                        try {
+                            return RedirectResponse::create('/403');
+                        } catch (\Exception $e) {
+                            echo sprintf(
+                                "Erreur lors de la redirect vers le page 403 dans le authMiddleware: %s",
+                                $e->getMessage()
+                            );
+                        }
                     }
                 }
             }
         }
 
         return $handler->handle($request);
+    }
+
+    private function hasRole(User $user, array $requiredRoles): bool
+    {
+        $userRoles = $this->userRepository->getRoles($user);
+
+        if (!empty(array_intersect($userRoles, $requiredRoles))) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -25,12 +25,11 @@ class TwigPathExtension extends AbstractExtension
         ];
     }
 
-
     /**
      * Genere un lien dans la vue Twig
      *
      * @param string $path
-     * @param array$params
+     * @param array $params
      * @return string
      * @throws NotFoundException|ContainerExceptionInterface
      */

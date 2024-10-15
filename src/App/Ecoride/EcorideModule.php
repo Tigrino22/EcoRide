@@ -1,23 +1,25 @@
 <?php
 
-namespace Tigrino\App\Home;
+namespace Tigrino\App\Ecoride;
 
-use Psr\Container\ContainerInterface;
 use Tigrino\Core\App;
+use Psr\Container\ContainerInterface;
 use Tigrino\Core\Modules\ModuleInterface;
 use Tigrino\Core\Renderer\RendererInteface;
 
-class HomeModule implements ModuleInterface
+class EcorideModule implements ModuleInterface
 {
     private App $app;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(App &$app, ContainerInterface $container)
     {
-        $this->app = $container->get(App::class);
+
+        $this->app = &$app;
         $this->app->getRouter()->addRoutes(include __DIR__ . "/Config/Routes.php");
 
         /** @var RendererInteface $renderer */
         $renderer = $container->get(RendererInteface::class);
+        $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Covoiturage', 'Covoiturage');
         $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Home', 'Home');
     }
 }

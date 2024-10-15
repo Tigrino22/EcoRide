@@ -2,15 +2,13 @@
 
 namespace Tigrino\Core\Session;
 
-use Ramsey\Uuid\Uuid;
-
 interface SessionManagerInterface
 {
-    public function createSession(string $userId): string;
+    public function set(string $key, mixed $value): void;
 
-    public function destroySession(string $sessionToken): bool;
+    public function get(string $key, mixed $default = null): mixed;
 
-    public function validateSession(string $sessionToken): bool;
+    public function has(string $key): bool;
 
-    public function getUserFromSession(string $sessionToken): ?int;
+    public function remove(string $key): void;
 }

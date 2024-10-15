@@ -5,10 +5,9 @@
  * Les middlewares sont ici à instancier.
  */
 
-use Tigrino\Core\Middleware\CORSMiddleware;
 use Tigrino\Core\Middleware\TrailingSlashMiddleware;
 
 return [
     new TrailingSlashMiddleware(),
-    //new CORSMiddleware(),
+    // new CORSMiddleware(),
 ];

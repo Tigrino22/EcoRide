@@ -5,20 +5,22 @@ namespace Tigrino\Auth\Controller;
 use GuzzleHttp\Psr7\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Ramsey\Uuid\Uuid;
-use Tigrino\Auth\Entity\User;
+use Tigrino\App\Ecoride\Entity\UserEcoride;
+use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
 use Tigrino\Core\Controller\AbstractController;
+use Tigrino\Core\Session\SessionManager;
 use Tigrino\Http\Response\JsonResponse;
-use Tigrino\Auth\Repository\UserRepository;
 
 class AuthController extends AbstractController
 {
-    private UserRepository $userRepository;
+    private UserEcorideRepository $userRepository;
+    private SessionManager $sessionManager;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->userRepository = new UserRepository();
+        $this->userRepository = new UserEcorideRepository();
+        $this->sessionManager = new SessionManager();
     }
 
     public function register(): ResponseInterface
@@ -26,39 +28,36 @@ class AuthController extends AbstractController
         if ($this->request->getMethod() === "POST") {
             $data = $this->request->getParsedBody();
 
-            $username = $data['username'] ?? null;
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
-            $role = $data['role'] ?? 'user';
-
-            if (!$username || !$email || !$password) {
+            if ($data['password'] != $data['confirm_password']) {
                 return new JsonResponse(
                     status: 400,
-                    data: ['message' => 'Champs manquants']
+                    data: ['message' => 'Les mot de passe ne correspondent pas']
                 );
             }
 
-            $hasedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $user = new UserEcoride($data);
 
-            $user = new User(
-                id: Uuid::uuid4(),
-                username: $username,
-                password: $hasedPassword,
-                roles: $role,
-                email: $email,
-                lastLogin: date('Y-m-d H:i:s')
-            );
+            if (!$this->userRepository->insert($user)) {
+                return new JsonResponse(
+                    status: 500,
+                    data: ['message' => 'Erreur lors de la création de l\'utilisateur']
+                );
+            } else {
+                // rediriger vers la page Login avec le champ email
+                // déja remplie
 
-            $this->userRepository->insert($user);
 
-            return new JsonResponse(
-                status: 201,
-                data: [
-                    'message' => 'Utilisateur créé avec succès',
-                    'Utilisateur uuid : ' => $user->getUuid()
-                ]
-            );
+                $content = $this->render("@Auth/login", ['user' => $user]);
+
+                $response = new Response(body: $content);
+                $response->withStatus(303);
+                $response->withHeader('Location', '/login');
+
+                return $response;
+            }
         }
+
+        // Methode GET
         $content = $this->render('@Auth/register');
 
         return new Response(
@@ -73,42 +72,43 @@ class AuthController extends AbstractController
         if ($this->request->getMethod() === "POST") {
             $data = $this->request->getParsedBody();
 
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
+            if (!$data['email'] || !$data['password']) {
+                return JsonResponse::create(data: ['message' => 'Identifiants manquant']);
+            }
 
-            if (!$email || !$password) {
-                return new JsonResponse(
-                    status: 400,
-                    data: ['message' => 'Email ou mot de passe manquant']
+            $user = $this->userRepository->findByEmail($data['email']);
+            if (!$user) {
+                return JsonResponse::create(
+                    data: ['message' => 'Aucun utilisateur trouvé pour cet email']
                 );
             }
 
-            /** @var User $user */
-            $user = $this->userRepository->findByEmail($email);
-            if (!$user || !password_verify($password, $user->getPassword())) {
-                return new JsonResponse(
-                    status: 401,
-                    data: ['message' => 'Identifiants invalides']
+            if (!password_verify($data['password'], $user->getPassword())) {
+                return JsonResponse::create(
+                    data: ['message' => 'Mot de passe incorrect']
                 );
             }
 
-            $sessionToken = bin2hex(random_bytes(16));
-            $user->setSessionToken($sessionToken);
-            $user->setUserCookie($user->getSessionToken());
-            $user->setLastLogin(date('Y-m-d H:i:s'));
+            $this->sessionManager->set('user', [
+                'id' => $user->getUuid(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
+                'name' => $user->getName(),
+                'firstname' => $user->getFirstname(),
+                'telephone' => $user->getTelephone(),
+                'address' => $user->getAddress(),
+                'birthday' => $user->getBirthday(),
+                'photo' => $user->getPhoto(),
+            ]);
 
-            $this->userRepository->update($user);
-
-            // TODO implémentation de la connexion via cookies pour API
-            return new JsonResponse(
+            return new Response(
                 status: 200,
-                data: [
-                    'message' => 'Connexion réussie',
-                    'session_token' => $sessionToken
-                ]
+                headers: ['Location' => '/'],
+                body: $this->render("@Home/home")
             );
         }
 
+        // Methode GET
         $content = $this->render('@Auth/login');
 
         return new Response(
@@ -120,40 +120,12 @@ class AuthController extends AbstractController
 
     public function logout(): ResponseInterface
     {
-        if ($this->request->getMethod() === "POST") {
-            $sessionToken = $this->request->getCookieParams()['session_token'];
-
-            if ($sessionToken) {
-                $user = $this->userRepository->findBySessionToken($sessionToken);
-
-                if ($user) {
-                    $user->setSessionToken(null);
-                    $this->userRepository->update($user);
-
-                    // Suppression du cookie
-                    setcookie("session_token", "", time() - 3600, "/");
-
-                    return new JsonResponse(
-                        status: 200,
-                        data: ['message' => 'Déconnexion réussie']
-                    );
-                } else {
-                    return new JsonResponse(
-                        status: 404,
-                        data: ['message' => 'Aucun utilisateur trouvé avec ce Token']
-                    );
-                }
-            } else {
-                return new JsonResponse(
-                    status: 404,
-                    data: ['message' => 'Aucun Token provide']
-                );
-            }
-        }
+        $this->sessionManager->remove('user');
 
         return new Response(
             status: 200,
-            body: "<h1>Page de déconnexion</h1>"
+            headers: ['Location' => '/'],
+            body: $this->render('@Home/home')
         );
     }
 }

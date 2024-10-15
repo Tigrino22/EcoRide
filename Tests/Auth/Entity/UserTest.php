@@ -4,48 +4,54 @@ namespace Tests\Auth\Entity;
 
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
+use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 
 class UserTest extends TestCase
 {
     private User $user;
-    private $uuid;
-    public function setUp(): void
+
+    protected function setUp(): void
     {
-        $this->uuid = Uuid::uuid4();
         $this->user = new User(
-            $this->uuid,
-            "userTest",
-            "passwordTest",
-            ['user'],
-            "email@test.fr",
-            "azeaze",
-            "2024-09-20 16:07:30"
+            'Tigrino',
+            'test',
+            'test@test.fr',
+            [Role::USER],
+            '01/01/1970'
         );
     }
 
-    public function testRole()
+    public function testGetId()
     {
-        $this->assertTrue($this->user->hasRole('user'));
+        $uuid = $this->user->getUuid();
 
-        $this->assertContainsEquals('user', $this->user->getRoles());
+        var_dump($uuid);
+
+        $this->assertInstanceOf(UuidInterface::class, $uuid);
+
+        $new_uuid = Uuid::uuid4();
+        $this->user->setUuid($new_uuid);
+
+        $this->assertEquals($new_uuid, $this->user->getUuid());
     }
 
-    public function testEmail()
+    public function testSetPassword()
     {
-        $this->user->setEmail("nouveau@test.fr");
-        $this->assertEquals("nouveau@test.fr", $this->user->getEmail());
+        $this->user->setPassword('test2');
+        $this->assertEquals('test2', $this->user->getPassword());
     }
 
-    public function testSessionToken()
+    public function testSetEmail()
     {
-        $this->user->setSessionToken("testtest");
-        $this->assertEquals("testtest", $this->user->getSessionToken());
+        $this->user->setEmail('test2@test.fr');
+        $this->assertEquals('test2@test.fr', $this->user->getEmail());
     }
 
-    public function testLastLogin()
+    public function testSetLastLogin()
     {
-        $this->user->setLastLogin("2025");
-        $this->assertEquals("2025", $this->user->getLastLogin());
+        $this->user->setLastLogin('01/01/2000');
+        $this->assertEquals('01/01/2000', $this->user->getLastLogin());
     }
 }

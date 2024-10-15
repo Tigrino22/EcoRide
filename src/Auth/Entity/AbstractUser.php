@@ -2,27 +2,28 @@
 
 namespace Tigrino\Auth\Entity;
 
-use Tigrino\Auth\Entity\UserInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 class AbstractUser implements UserInterface
 {
-    protected $uuid;
     protected string $username;
     protected string $password;
+    private UuidInterface $uuid;
 
-    public function __construct($uuid, string $username, string $password)
+    public function __construct(string $username, string $password)
     {
-        $this->uuid = $uuid;
+        $this->uuid = Uuid::uuid4();
         $this->username = $username;
-        $this->password = $password;
+        $this->password = password_hash($password, PASSWORD_BCRYPT);
     }
 
-    public function getUuid()
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): void
+    public function setUuid(UuidInterface $uuid): void
     {
         $this->uuid = $uuid;
     }

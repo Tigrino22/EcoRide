@@ -2,80 +2,41 @@
 
 namespace Tigrino\Core\Session;
 
-use Ramsey\Uuid\Uuid;
-use Random\RandomException;
-use Tigrino\Core\Database\DatabaseInterface;
+use Tigrino\Core\Session\SessionManagerInterface;
 
 class SessionManager implements SessionManagerInterface
 {
-    private DatabaseInterface $db;
-
-    public function __construct(DatabaseInterface $db)
+    public function set(string $key, mixed $value): void
     {
-        $this->db = $db;
+        $this->startSession();
+        $_SESSION[$key] = $value;
     }
 
-    /**
-     * Crée un session pour l'utilisateur.
-     *
-     * @param int $userId
-     * @return string
-     * @throws RandomException
-     */
-    public function createSession(string $userId): string
+    public function get(string $key, mixed $default = null): mixed
     {
-        $sessionToken = bin2hex(random_bytes(32));
-        // Sauvegarde en base avec l'ID de l'utilisateur
-        $this->db->execute(
-            "INSERT INTO sessions (user_id, session_token) VALUES (?, ?)",
-            [$userId, $sessionToken]
-        );
-        return $sessionToken;
+        $this->startSession();
+        return $_SESSION[$key] ?? $default;
     }
 
-    /**
-     * Sert à détruire l'utilisateur en session,
-     * NON la session elle même.
-     * Le jeton en BDD sera supprimé
-     *
-     * @param string $sessionToken
-     * @return bool
-     */
-    public function destroySession(string $sessionToken): bool
+    public function has(string $key): bool
     {
-        return $this->db->execute(
-            "DELETE FROM sessions WHERE session_token = ?",
-            [$sessionToken]
-        );
+        $this->startSession();
+        return isset($_SESSION[$key]);
     }
 
-    /**
-     * Permet de vérifier si la session est bien valide
-     *
-     * @param string $sessionToken
-     * @return bool
-     */
-    public function validateSession(string $sessionToken): bool
+    public function remove(string $key): void
     {
-        $result = $this->db->query(
-            "SELECT user_id FROM sessions WHERE session_token = ?",
-            [$sessionToken]
-        );
-        return !empty($result);
+        $this->startSession();
+        unset($_SESSION[$key]);
+        if (empty($_SESSION)) {
+            session_destroy();
+        }
     }
 
-    /**
-     * Récupère l'utilisateur depuis un token de session
-     *
-     * @param string $sessionToken
-     * @return int|null
-     */
-    public function getUserFromSession(string $sessionToken): ?int
+    private function startSession(): void
     {
-        $result = $this->db->query(
-            query: "SELECT user_id FROM sessions WHERE session_token = ?",
-            params: [$sessionToken]
-        );
-        return $result ? (int)$result['user_id'] : null;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 }

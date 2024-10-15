@@ -4,12 +4,12 @@
  * L'injection des modules ici se fait par nom de dossier.
  */
 
+use Tigrino\App\Ecoride\EcorideModule;
 use Tigrino\Auth\AuthModule;
-use Tigrino\App\Home\HomeModule;
-use Tigrino\App\Covoiturage\CovoiturageModule;
+use Tigrino\Errors\ErrorModule;
 
 return [
-    CovoiturageModule::class,
-    HomeModule::class,
+    EcorideModule::class,
     AuthModule::class,
+    ErrorModule::class,
 ];

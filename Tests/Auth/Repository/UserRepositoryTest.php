@@ -4,148 +4,167 @@ namespace Tests\Auth\Repository;
 
 use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
+use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Database\Database;
 
 class UserRepositoryTest extends TestCase
 {
-    private UserRepository $userRepository;
-    private Database $database;
+    private Database $db;
+    private UserRepository $repository;
+
 
     protected function setUp(): void
     {
-        $dotenv = Dotenv::createUnsafeImmutable(
-            dirname(dirname(__DIR__, 2))
+        $this->db = new Database('sqlite');
+        $this->repository = new UserRepository($this->db);
+
+        $this->db->execute('DROP TABLE IF EXISTS users_roles');
+        $this->db->execute('DROP TABLE IF EXISTS roles');
+        $this->db->execute('DROP TABLE IF EXISTS users');
+
+        $this->db->execute('CREATE TABLE IF NOT EXISTS users (
+            id BLOB PRIMARY KEY,
+            username TEXT,
+            email TEXT,
+            password TEXT,
+            last_login DATETIME
+        )');
+
+        $this->db->execute('CREATE TABLE IF NOT EXISTS roles (
+            id BLOB PRIMARY KEY,
+            name TEXT,
+            number INTEGER
+        )');
+
+        $this->db->execute('CREATE TABLE IF NOT EXISTS users_roles (
+            user_id BLOB,
+            role_id BLOB,
+            PRIMARY KEY (user_id, role_id)
+        )');
+
+        $this->db->execute(
+            'INSERT INTO roles (id, name, number)
+            VALUES 
+                (?, "SUPERADMIN", 0),
+                (?, "ADMIN", 1),
+                (?, "USER", 2),
+                (?, "GUEST", 3)',
+            [
+                hex2bin('08cc137eba2a42078f7202c7f859fea2'),  // Conversion en binaire
+                hex2bin('284c4c6acb3349a2abb2bfa4083a59b2'),  // Conversion en binaire
+                hex2bin('3bb93f51b0834fa9bd4b55e358b62e1c'),  // Conversion en binaire
+                hex2bin('05f10bf37bec45128ae2d236b5786eab')   // Conversion en binaire
+            ]
         );
-        $dotenv->load();
 
-        $this->database = new Database();
-        $this->userRepository = new UserRepository();
-
-        $this->database->execute(
-            query: "DROP TABLE IF EXISTS users"
-        );
-
-        // Crée une table pour les tests
-        $this->database->execute(query: "
-            CREATE TABLE IF NOT EXISTS users (
-            id CHAR(36) NOT NULL,
-            username VARCHAR(60) NOT NULL,
-            email VARCHAR(150) NOT NULL,
-            password VARCHAR(60) NOT NULL,
-            roles JSON NOT NULL,
-            session_token VARCHAR(128),
-            is_banned BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            last_login DATETIME,
-            primary key (id),
-            unique (email),
-            unique (username)
-        )");
+        $user = new User('test_user', 'password123', 'test@example.com', [Role::ADMIN]);
+        $user2 = new User('test_user2', 'password123', 'test2@example.com');
+        $user3 = new User('GUEST', 'password123', 'test3@example.com');
+        $this->repository->insert($user);
+        $this->repository->insert($user2);
+        $this->repository->insert($user3);
     }
 
     protected function tearDown(): void
     {
-        // Supprime la base de données de test
-        $this->database->execute("DROP TABLE IF EXISTS users");
+        $this->db->execute('DROP TABLE IF EXISTS users_roles');
+        $this->db->execute('DROP TABLE IF EXISTS roles');
+        $this->db->execute('DROP TABLE IF EXISTS users');
     }
 
-    public function testInsert()
+    public function testInsertUser()
     {
-        $user = new User(
-            id: 'test-uuid',
-            username: 'testuser',
-            password: 'password',
-            roles: ['ROLE_USER'],
-            email: 'test@example.com',
-            sessionToken: null,
-            lastLogin: null
-        );
+        $user = new User('test_user3', 'password123', 'test3@example.com');
 
-        $result = $this->userRepository->insert($user);
-
+        $result = $this->repository->insert($user);
         $this->assertTrue($result);
-    }
-
-    public function testUpdate()
-    {
-        $user = new User(
-            id: 'test-uuid',
-            username: 'testuser',
-            password: 'password',
-            roles: ['ROLE_USER'],
-            email: 'test@example.com',
-            sessionToken: 'new-token',
-            lastLogin: '2024-01-01 00:00:00'
-        );
-
-        $result = $this->userRepository->update($user);
-
-        $this->assertTrue($result);
-    }
-
-    public function testFindByEmail()
-    {
-        $this->database->execute(query: "
-            INSERT INTO users (id, username, email, password, roles, session_token, last_login)
-            VALUES (
-                    'test-uuid', 
-                    'testuser', 
-                    'test@example.com', 
-                    'password', 
-                    '[\"ROLE_USER\"]', 
-                    'new-token', 
-                    '2024-01-01 00:00:00'
-                )
-        ");
-
-        $user = $this->userRepository->findByEmail('test@example.com');
-
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals('test@example.com', $user->getEmail());
     }
 
     public function testFindByUsername()
     {
-        $this->database->execute(query: "
-            INSERT INTO users (id, username, email, password, roles, session_token, last_login)
-            VALUES (
-                    'test-uuid', 
-                    'testuser', 
-                    'test@example.com', 
-                    'password', 
-                    '[\"ROLE_USER\"]', 
-                    'new-token', 
-                    '2024-01-01 00:00:00'
-                )
-        ");
-
-        $user = $this->userRepository->findByUsername('testuser');
+        $user = $this->repository->findByUsername('test_user');
 
         $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals('testuser', $user->getUsername());
+        $this->assertEquals('test_user', $user->getUsername());
+
+        $user_wrong = $this->repository->findByUsername('wrong_user');
+
+        $this->assertNull($user_wrong);
     }
 
-    public function testFindBySessionToken()
+    public function testFindByEmail()
     {
-        $this->database->execute(query: "
-            INSERT INTO users (id, username, email, password, roles, session_token, last_login)
-            VALUES (
-                    'test-uuid', 
-                    'testuser', 
-                    'test@example.com', 
-                    'password', 
-                    '[\"ROLE_USER\"]', 
-                    'new-token', 
-                    '2024-01-01 00:00:00'
-                )
-        ");
-
-        $user = $this->userRepository->findBySessionToken('new-token');
+        $user = $this->repository->findByEmail('test@example.com');
 
         $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals('new-token', $user->getSessionToken());
+        $this->assertEquals('test_user', $user->getUsername());
+
+        $user_wrong = $this->repository->findByUsername('wrong@mail.fr');
+
+        $this->assertNull($user_wrong);
+    }
+
+    public function testUpdateAndFindAgainUser()
+    {
+        $user = $this->repository->findByUsername('test_user');
+        $this->assertNotNull($user, "L'utilisateur 'test_user' n'a pas été trouvé.");
+
+        $user->setUsername('test_user_modified');
+
+        $result = $this->repository->update($user);
+        $this->assertTrue($result, "La mise à jour de l'utilisateur a échoué.");
+
+        $updatedUser = $this->repository->findByUsername('test_user_modified');
+        $this->assertNotNull(
+            $updatedUser,
+            "L'utilisateur 'test_user_modified' n'a pas été trouvé après la mise à jour."
+        );
+
+        $this->assertEquals('test_user_modified', $updatedUser->getUsername());
+    }
+
+    public function testGetRoleUser()
+    {
+        $user = $this->repository->findByUsername('test_user2');
+        $role = $this->repository->getRoles($user);
+
+        $this->assertIsArray($role);
+        $this->assertContains(Role::USER, $role);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSetRoleUser()
+    {
+        $user = $this->repository->findByUsername('test_user');
+
+        $this->assertInstanceOf(User::class, $user);
+
+        $user_result = $this->repository->setRole($user, [Role::USER]);
+        $this->assertInstanceOf(User::class, $user_result);
+
+        $this->assertContains(Role::USER, $user_result->getRoles());
+
+        $user = $this->repository->findByUsername('GUEST');
+        $this->assertInstanceOf(User::class, $user);
+        $role = $this->repository->getRoles($user);
+
+        $this->assertIsArray($role);
+        $this->assertContains(Role::GUEST, $role);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSetRoleDoesNotExist()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Aucun rôle n'a été trouvé avec le code : 5");
+
+        $user = $this->repository->findByUsername('test_user');
+        $this->repository->setRole($user, [5]);
     }
 }

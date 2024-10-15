@@ -17,5 +17,5 @@ return [
 
     RendererInteface::class => factory(TwigRendererFactory::class),
     Router::class => autowire(Router::class),
-    AuthController::class => autowire(),
+    AuthController::class => autowire()
 ];

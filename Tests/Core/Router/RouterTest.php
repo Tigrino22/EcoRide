@@ -8,6 +8,9 @@ use Dotenv\Dotenv;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
+use Tigrino\Auth\Config\Role;
+use Tigrino\Auth\Repository\UserRepository;
+use Tigrino\Core\Database\Database;
 use Tigrino\Core\Router\Router;
 use Tests\Core\Controllers\TestController;
 use Tigrino\Auth\AuthModule;
@@ -20,6 +23,8 @@ class RouterTest extends TestCase
     /** @var Router */
     private $router;
     private Container $container;
+    private Database $db;
+    private UserRepository $userRepository;
 
     protected function setUp(): void
     {
@@ -30,20 +35,71 @@ class RouterTest extends TestCase
         $containerBuilder->addDefinitions(dirname(__DIR__, 2) . '/Config/Container.php');
         $this->container = $containerBuilder->build();
 
+        $this->db = new Database('sqlite');
+        $this->userRepository = new UserRepository($this->db);
+
+        $this->db->execute('DROP TABLE IF EXISTS users_roles');
+        $this->db->execute('DROP TABLE IF EXISTS roles');
+        $this->db->execute('DROP TABLE IF EXISTS users');
+
+        $this->db->execute('CREATE TABLE IF NOT EXISTS users (
+            id BLOB PRIMARY KEY,
+            username TEXT,
+            email TEXT,
+            password TEXT,
+            last_login DATETIME
+        )');
+
+        $this->db->execute('CREATE TABLE IF NOT EXISTS roles (
+            id BLOB PRIMARY KEY,
+            name TEXT,
+            number INTEGER
+        )');
+
+        $this->db->execute('CREATE TABLE IF NOT EXISTS users_roles (
+            user_id BLOB,
+            role_id BLOB,
+            PRIMARY KEY (user_id, role_id)
+        )');
+
+        $this->db->execute(
+            'INSERT INTO roles (id, name, number)
+            VALUES 
+                (?, "SUPERADMIN", 0),
+                (?, "ADMIN", 1),
+                (?, "USER", 2),
+                (?, "GUEST", 3)',
+            [
+                hex2bin('08cc137eba2a42078f7202c7f859fea2'),  // Conversion en binaire
+                hex2bin('284c4c6acb3349a2abb2bfa4083a59b2'),  // Conversion en binaire
+                hex2bin('3bb93f51b0834fa9bd4b55e358b62e1c'),  // Conversion en binaire
+                hex2bin('05f10bf37bec45128ae2d236b5786eab')   // Conversion en binaire
+            ]
+        );
+
         $this->router = new Router($this->container);
+        $this->router->addRoutes([
+            ["GET", "/test/show", [TestController::class, "index"], "test.show", []],
+            ["GET", "/test/callable", function () {
+                return new Response(200, [], "Hello test callable");
+            }, "test.callable", []],
+            ["GET", "/test/notfound", [TestController::class, "index"], "test.notfound", []],
+            ["GET", "/test/[i:id]-[a:slug]", [TestController::class, "show"], "test.showWithId", []],
+            ["POST", "/test/create", [TestController::class, "create"], "test.create", []]
+        ]);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->db->execute('DROP TABLE IF EXISTS users_roles');
+        $this->db->execute('DROP TABLE IF EXISTS roles');
+        $this->db->execute('DROP TABLE IF EXISTS users');
     }
 
     public function testGetRouteMatched()
     {
-        // Définir une route GET simple
-        $routes = [
-            ["GET", "/test", [TestController::class, "index"], "test.show", []]
-        ];
-
-        $this->router->addRoutes($routes);
-
         // Simuler une requête GET sur /test
-        $request = new ServerRequest('GET', '/test');
+        $request = new ServerRequest('GET', '/test/show');
 
         // Dispatcher la requête et obtenir la réponse
         $response = $this->router->dispatch($request);
@@ -55,17 +111,8 @@ class RouterTest extends TestCase
 
     public function testGetRouteMatchedWithCallable()
     {
-        // Définir une route GET simple
-        $routes = [
-            ["GET", "/test", function () {
-                return new Response(200, [], "Hello test callable");
-            }, "test.show", []]
-        ];
-
-        $this->router->addRoutes($routes);
-
         // Simuler une requête GET sur /test
-        $request = new ServerRequest('GET', '/test');
+        $request = new ServerRequest('GET', '/test/callable');
 
         // Dispatcher la requête et obtenir la réponse
         $response = $this->router->dispatch($request);
@@ -77,15 +124,8 @@ class RouterTest extends TestCase
 
     public function testPostRouteNotFound()
     {
-        // Définir une route GET mais tester une requête POST
-        $routes = [
-            ["GET", "/test", [TestController::class, "index"], "test.show", []]
-        ];
-
-        $this->router->addRoutes($routes);
-
         // Simuler une requête POST sur /test
-        $request = new ServerRequest('POST', '/test');
+        $request = new ServerRequest('POST', '/test/notfound');
 
         // Dispatcher la requête et obtenir la réponse
         $response = $this->router->dispatch($request);
@@ -100,13 +140,6 @@ class RouterTest extends TestCase
      */
     public function testRouteWithParameter()
     {
-        // Définir une route avec un paramètre {id}
-        $routes = [
-            ["GET", "/test/[i:id]-[a:slug]", [TestController::class, "show"], "test.showWithId", []]
-        ];
-
-        $this->router->addRoutes($routes);
-
         // Simuler une requête GET sur /test/123
         $request = new ServerRequest('GET', '/test/123-Tigrino');
 
@@ -134,18 +167,16 @@ class RouterTest extends TestCase
 
     public function testProtectedRouteAccess()
     {
-        // Définir une route protégée
-        $routes = [
-            ["GET", "/admin", [TestController::class, "admin"], "admin.dashboard", ["admin"]]
-        ];
-
         $app = new App($this->container, [AuthModule::class]);
-        $app->addMiddleware(new AuthMiddleware($this->container->get(Router::class)));
-        $app->getRouter()->addRoutes($routes);
+        $app->addMiddleware(new AuthMiddleware($this->container, $this->userRepository));
+
+        $app->getRouter()->addRoutes([
+            ["GET", "/admin", [TestController::class, "admin"], "admin.dashboard", [Role::ADMIN]],
+        ]);
 
         // Simuler une requête avec un rôle insuffisant
         $request = new ServerRequest('GET', '/admin');
-        $request = $request->withAttribute('user_role', 'user'); // Rôle insuffisant
+        $request = $request->withAttribute('user_role', Role::ADMIN); // Rôle insuffisant
 
         // Dispatcher la requête et obtenir la réponse
         $response = $app->run($request);
@@ -157,19 +188,18 @@ class RouterTest extends TestCase
 
     public function testAccessGrantedForProtectedRoute()
     {
-        // Définir une route protégée
-        $routes = [
-            ["GET", "/admin", [TestController::class, "admin"], "admin.dashboard", ["admin"]]
-        ];
-
-        $this->router->addRoutes($routes);
-
         // Simuler une requête avec un rôle suffisant
         $request = new ServerRequest('GET', '/admin');
-        $request = $request->withAttribute('user_role', 'admin'); // Rôle suffisant
+        $request = $request->withAttribute('user_role', Role::ADMIN); // Rôle suffisant
+
+        $app = new App($this->container, [AuthModule::class]);
+        $app->addMiddleware(new AuthMiddleware($this->container, $this->userRepository));
+        $app->getRouter()->addRoutes([
+            ["GET", "/admin", [TestController::class, "admin"], "admin.dashboard", [Role::ADMIN]],
+        ]);
 
         // Dispatcher la requête et obtenir la réponse
-        $response = $this->router->dispatch($request);
+        $response = $app->run($request);
 
         // Vérifier que la réponse est correcte
         $this->assertEquals(200, $response->getStatusCode());
@@ -179,10 +209,6 @@ class RouterTest extends TestCase
     public function testCreate()
     {
         $controller = new TestController($this->container);
-
-        $routes = [
-            ["POST", "/test/create", [TestController::class, "create"], "test.create", []]
-        ];
 
         // Simuler une requête POST avec des données
         $request = new ServerRequest(
@@ -208,5 +234,23 @@ class RouterTest extends TestCase
             'data' => ['title' => 'New Post', 'content' => 'This is a new post']
         ];
         $this->assertJsonStringEqualsJsonString(json_encode($expected), $body);
+    }
+
+    public function testGetRoutes()
+    {
+        $routes = $this->router->getRoutes();
+
+        $this->assertEquals(5, count($routes));
+    }
+
+    public function testGenerateRoute()
+    {
+        $route = $this->router->generate('test.show');
+
+        $this->assertEquals('/test/show', $route);
+
+        $route = $this->router->generate('test.showWithId', ['id' => 1, 'slug' => 'val']);
+
+        $this->assertEquals('/test/1-val', $route);
     }
 }

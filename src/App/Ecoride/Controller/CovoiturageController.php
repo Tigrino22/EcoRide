@@ -1,6 +1,6 @@
 <?php
 
-namespace Tigrino\App\Covoiturage\Controller;
+namespace Tigrino\App\Ecoride\Controller;
 
 use GuzzleHttp\Psr7\Response;
 use Tigrino\Core\Controller\AbstractController;

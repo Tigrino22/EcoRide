@@ -2,52 +2,34 @@
 
 namespace Tigrino\Auth\Entity;
 
+use Tigrino\Auth\Config\Role;
+
 /**
  * Class UserRepository de base
  * Cette classe représente l'entité UserRepository qui est hydratée
  * avec des données récupérées depuis la base de données.
+ *
+ * Il est important de préciser que le role par défaut d'un
+ * utilisateur inscrit est USER = 2
  */
 class User extends AbstractUser
 {
-    protected array $roles;
     protected ?string $email;
-    protected ?string $sessionToken;
     protected ?string $lastLogin;
+    private array $roles;
 
 
     public function __construct(
-        $id,
         string $username,
         string $password,
-        array $roles = [],
         ?string $email = null,
-        ?string $sessionToken = null,
+        array $roles = [Role::USER],
         ?string $lastLogin = null
     ) {
-        parent::__construct($id, $username, $password);
+        parent::__construct($username, $password);
         $this->roles = $roles;
         $this->email = $email;
-        $this->sessionToken = $sessionToken;
         $this->lastLogin = $lastLogin;
-    }
-
-    /**
-     * Vérifie si l'utilisateur a un rôle spécifique.
-     *
-     * @param string $role
-     * @return bool
-     */
-    public function hasRole(string $role): bool
-    {
-        return in_array($role, $this->roles);
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoles(): array
-    {
-        return $this->roles;
     }
 
     /**
@@ -69,22 +51,6 @@ class User extends AbstractUser
     /**
      * @return string|null
      */
-    public function getSessionToken(): ?string
-    {
-        return $this->sessionToken;
-    }
-
-    /**
-     * @param string|null $sessionToken
-     */
-    public function setSessionToken(?string $sessionToken): void
-    {
-        $this->sessionToken = $sessionToken;
-    }
-
-    /**
-     * @return string|null
-     */
     public function getLastLogin(): ?string
     {
         return $this->lastLogin;
@@ -98,19 +64,13 @@ class User extends AbstractUser
         $this->lastLogin = $lastLogin;
     }
 
-    public function setUserCookie($token)
+    public function getRoles(): array
     {
-        return setcookie(
-            "session_token",
-            $token, // le token de session généré
-            [
-                'expires' => time() + 3600,  // expiration dans 1 heure
-                'path' => '/',
-                'domain' => '', // votre domaine
-                'secure' => true,  // true pour HTTPS uniquement
-                'httponly' => true, // inaccessible via JavaScript
-                'samesite' => 'Strict'  // ou 'Lax'
-            ]
-        );
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
     }
 }

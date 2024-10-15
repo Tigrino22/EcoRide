@@ -2,10 +2,12 @@
 
 namespace Tigrino\Auth\Entity;
 
+use Ramsey\Uuid\UuidInterface;
+
 interface UserInterface
 {
-    public function getUuid();
-    public function setUuid(string $uuid): void;
+    public function getUuid(): UuidInterface;
+    public function setUuid(UuidInterface $uuid): void;
 
     public function getUsername(): string;
     public function setUsername(string $username): void;
