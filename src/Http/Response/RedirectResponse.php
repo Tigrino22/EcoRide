@@ -15,8 +15,12 @@ class RedirectResponse extends Response
      * @param array $headers Les en-têtes supplémentaires (par défaut vide)
      * @return static
      */
-    public static function create(string $path, int $status = 302, array $headers = []): self
-    {
+    public static function create(
+        string $path,
+        int $status = 302,
+        array $headers = []
+    ): self {
+
         $headers = array_merge($headers, ['Location' => $path]);
 
         return new self(status: $status, headers: $headers, body: Utils::streamFor(''));

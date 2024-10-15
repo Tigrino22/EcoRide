@@ -9,12 +9,13 @@ import {dropdown} from "./Dropdown";
 
 window.addEventListener('DOMContentLoaded', () => {
     //initFlowbite();
+   dropdown();
 });
 
 // Modules ayant besoin d'être rechargés au changement de page (liens de navigation)
-document.addEventListener('turbolinks:load', () => {
-   dropdown();
+//document.addEventListener('turbolinks:load', () => {
+   //dropdown();
     //register();
-});
+//});
 
 //Turbolinks.start();

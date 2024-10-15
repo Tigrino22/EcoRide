@@ -13,8 +13,8 @@ class UserEcoride extends User
     private ?string $address;
     private ?string $birthday;
     private ?string $photo;
-    private string $created_at;
-    private string $updated_at;
+    private ?string $created_at;
+    private ?string $updated_at;
 
     public function __construct(array $data = [])
     {

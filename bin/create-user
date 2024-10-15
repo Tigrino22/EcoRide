@@ -36,11 +36,9 @@ $hashedPass = password_hash($password, PASSWORD_BCRYPT);
 
 // Création de l'utilisateur avec les données fournies
 $user = new User(
-        id: Uuid::uuid4(),
         username: $username,
-        password: $hashedPass,
-        roles: (array)$role,
-        email: $email
+    password: $hashedPass,
+    email: $email
 );
 
 // Sauvegarde de l'utilisateur en base de données
