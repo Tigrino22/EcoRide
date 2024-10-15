@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 use Tigrino\Core\Controller\AbstractController;
 use Tigrino\Core\Router\Exception\ControllerException;
+use Tigrino\Http\Response\RedirectResponse;
 
 /**
  * Router based on Altorouter
@@ -35,7 +36,7 @@ class Router implements RouterInterface
      *
      * @var Altorouter
      */
-    private $router = null;
+    private AltoRouter $router;
 
     /**
      * Tableaux representant les routes protégées
@@ -43,8 +44,8 @@ class Router implements RouterInterface
      *
      * @var string[]
      */
-    private $protectedRoutes = [];
-    private $container;
+    private array $protectedRoutes = [];
+    private ContainerInterface $container;
 
     /**
      * Initialise l'instance d'AltoRouter lors de la création du Router.
@@ -137,7 +138,9 @@ class Router implements RouterInterface
                 throw new ControllerException("La target {$route['target']} n'est pas une callable.");
             }
         } else {
-            return new Response(404, [], "<h1>Page not found</h1>");
+            return RedirectResponse::create(
+                $this->generate('error.404')
+            );
         }
     }
 

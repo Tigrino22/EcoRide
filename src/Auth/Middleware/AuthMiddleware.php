@@ -79,7 +79,9 @@ class AuthMiddleware implements MiddlewareInterface
                     // Vérifier si l'utilisateur a les rôles requis
                     if (count($requiredRoles) > 0 && !$this->hasRole($user, $requiredRoles)) {
                         try {
-                            return RedirectResponse::create('/403');
+                            return RedirectResponse::create(
+                                $this->router->generate('error.403')
+                            );
                         } catch (\Exception $e) {
                             echo sprintf(
                                 "Erreur lors de la redirect vers le page 403 dans le authMiddleware: %s",
