@@ -10,15 +10,36 @@ class CovoiturageController extends AbstractController
 {
     public function index(): ResponseInterface
     {
-
-        $search = true;
-        $datas = compact('search');
-        $content = $this->render('@Covoiturage/covoiturage', $datas);
+        $content = $this->render('@Covoiturage/covoiturage');
 
         return new Response(
             200,
             [],
             $content
         );
+    }
+
+    public function searchCovoiturage(): ResponseInterface
+    {
+        $search = true;
+
+        // Reception de la requete
+        // Recuperation des paramêtre
+        // Recherche en BDD
+        // Compact des information
+        // Preparation de le vue
+        // Retour de la vue avec les covoiturage récupérés.
+
+//        $covoiturages = null;
+//
+//        $params = compact('covoiturages');
+//
+//        $content = $this->render('@Covoiturage/covoiturage');
+//
+//        return new Response(
+//            200,
+//            [],
+//            $content
+//        );
     }
 }

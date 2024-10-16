@@ -10,10 +10,10 @@ export default defineConfig({
         copyPublicDir: false,
         outDir: 'Public/assets',
         assetsDir: '',
-      // generate .vite/manifest.json in outDir
+        // generate .vite/manifest.json in outDir
         manifest: true,
         rollupOptions: {
-          // overwrite default .html entry
+            // overwrite default .html entry
             input: 'assets/ts/main.ts',
         },
     },

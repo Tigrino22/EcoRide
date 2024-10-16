@@ -9,5 +9,4 @@ return [
     [ "GET",        '/',            [HomeController::class, 'index'],           'home',             []],
     [ "GET",        '/contact',     [HomeController::class, 'contact'],         'home.contact',     []],
     [ "GET",        '/covoiturage', [CovoiturageController::class, 'index'],    'covoiturage',      []],
-    [ "GET",        '/admin',       [HomeController::class, 'admin'],           'admin',           [Role::ADMIN]],
 ];
