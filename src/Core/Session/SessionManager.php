@@ -2,8 +2,6 @@
 
 namespace Tigrino\Core\Session;
 
-use Tigrino\Core\Session\SessionManagerInterface;
-
 class SessionManager implements SessionManagerInterface
 {
     public function set(string $key, mixed $value): void

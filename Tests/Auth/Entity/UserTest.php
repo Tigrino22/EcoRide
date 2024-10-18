@@ -23,11 +23,9 @@ class UserTest extends TestCase
         );
     }
 
-    public function testGetId()
+    public function testGetAndSetId()
     {
         $uuid = $this->user->getUuid();
-
-        var_dump($uuid);
 
         $this->assertInstanceOf(UuidInterface::class, $uuid);
 
@@ -40,7 +38,8 @@ class UserTest extends TestCase
     public function testSetPassword()
     {
         $this->user->setPassword('test2');
-        $this->assertEquals('test2', $this->user->getPassword());
+
+        $this->assertTrue(password_verify('test2', $this->user->getPassword()));
     }
 
     public function testSetEmail()

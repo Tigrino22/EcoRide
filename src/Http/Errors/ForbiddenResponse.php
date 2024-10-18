@@ -4,7 +4,7 @@ namespace Tigrino\Http\Errors;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Container\ContainerInterface;
-use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Renderer\TwigRenderer;
 
 /**

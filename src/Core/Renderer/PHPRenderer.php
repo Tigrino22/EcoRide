@@ -2,7 +2,7 @@
 
 namespace Tigrino\Core\Renderer;
 
-class PHPRenderer implements RendererInteface
+class PHPRenderer implements RendererInterface
 {
     private const string DEFAULT_NAMESPACE = '__main';
     private array $paths = [];

@@ -4,6 +4,7 @@ namespace Tigrino\Auth\Repository;
 
 use Exception;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Core\Database\Database;
@@ -51,6 +52,32 @@ class UserRepository
         return $this->flush($user, $query, $params);
     }
 
+    public function delete(User|UuidInterface $param): bool
+    {
+        $query = 'DELETE FROM users WHERE id = :id';
+
+        try {
+            if ($param instanceof UuidInterface) {
+                $params = [
+                    ':id' => $param->getBytes(),
+                ];
+            } elseif ($param instanceof User) {
+                $params = [
+                    ':id' => $param->getUuid()->getBytes(),
+                ];
+            } else {
+                throw new Exception(
+                    'Parameter must be an instance of UuidInterface or User'
+                );
+            }
+
+            return $this->db->execute($query, $params);
+        } catch (Exception $e) {
+            echo "Erreur lors de la suppression de l'utilisateur" . $e->getMessage();
+            return false;
+        }
+    }
+
     public function findByEmail(string $email): ?User
     {
         $query = 'SELECT * FROM users WHERE email = :email LIMIT 1';
@@ -93,6 +120,7 @@ class UserRepository
     /**
      * Modifie la liste des roles actuelle de
      * l'utilisateur vers une nouvelle liste
+     *
      * @param User $user
      * @param array $roles
      * @return bool|User
@@ -157,10 +185,13 @@ class UserRepository
     }
 
     /**
+     * Récupère via une requete SQL les roles de l'user
+     * Et les retourne sous forme de tableau.
+     *
      * @param User $user
-     * @return array|int
+     * @return array
      */
-    public function getRoles(User $user): array|int
+    public function getRoles(User $user): array
     {
 
         // Si l'utilisateur est un invité
@@ -202,7 +233,7 @@ class UserRepository
      * @param array $data
      * @return User
      */
-    private function mapDataToUser(array $data): User
+    protected function mapDataToUser(array $data): User
     {
         $user =  new User(
             username: $data['username'],
@@ -218,12 +249,14 @@ class UserRepository
     }
 
     /**
+     * Enregistre les données d'un utilisateur en BDD
+     *
      * @param User $user
      * @param string $query
      * @param array $params
-     * @return User|null
+     * @return false|User
      */
-    protected function flush(User $user, string $query, array $params): ?User
+    protected function flush(User $user, string $query, array $params): false|User
     {
         try {
             // Enregistrement des rôles.

@@ -6,7 +6,7 @@ use function DI\autowire;
 
 use Tigrino\Core\Router\Router;
 use Tigrino\Auth\Controller\AuthController;
-use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Renderer\TwigRendererFactory;
 
 return [
@@ -15,7 +15,7 @@ return [
     'environnement' => env('APP_ENV', 'DEV'), // Sert notamment pour le front avec Vite et TwigAssetExtension
     'modules' => include(__DIR__ . '/Modules.php'),
 
-    RendererInteface::class => factory(TwigRendererFactory::class),
+    RendererInterface::class => factory(TwigRendererFactory::class),
     Router::class => autowire(Router::class),
     AuthController::class => autowire()
 ];

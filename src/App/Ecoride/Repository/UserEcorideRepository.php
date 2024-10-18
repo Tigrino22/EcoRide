@@ -7,12 +7,13 @@ use Ramsey\Uuid\UuidInterface;
 use Tigrino\App\Ecoride\Entity\UserEcoride;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
+use Tigrino\Core\Database\Database;
 
 class UserEcorideRepository extends UserRepository
 {
-    public function __construct()
+    public function __construct(Database $database = null)
     {
-        parent::__construct();
+        parent::__construct($database);
     }
 
     public function insert(User $user): ?User
@@ -44,6 +45,7 @@ class UserEcorideRepository extends UserRepository
     {
         // Mise à jour de l'utilisateur
         $query = 'UPDATE users SET 
+            username = :username,
             name = :name,
             firstname = :firstname,
             email = :email,
@@ -57,6 +59,7 @@ class UserEcorideRepository extends UserRepository
 
         $params = [
             ':id' => $user->getUuid()->getBytes(), // UUID en format binaire si nécessaire
+            ':username' => $user->getUsername(),
             ':name' => $user->getName(),
             ':firstname' => $user->getFirstname(),
             ':email' => $user->getEmail(),
@@ -71,33 +74,6 @@ class UserEcorideRepository extends UserRepository
         return $this->flush($user, $query, $params);
     }
 
-    public function findByEmail(string $email): ?UserEcoride
-    {
-        $query = 'SELECT * FROM users WHERE email = :email LIMIT 1';
-        $params = [':email' => $email];
-
-        $result = $this->db->query($query, $params);
-
-        if ($result) {
-            return $this->mapDataToUser($result[0]);
-        }
-
-        return null;
-    }
-
-    public function findById(UuidInterface $id): ?User
-    {
-        $query = 'SELECT * FROM users WHERE id = :id';
-        $params = [':id' => $id->getBytes()];
-
-        $result = $this->db->query($query, $params);
-        if ($result) {
-            return $this->mapDataToUser($result[0]);
-        }
-
-        return null;
-    }
-
     /**
      * Cette fonction retourne un objet UserEcoride
      * si une correspondance est trouvée avec les méthodes find.
@@ -105,7 +81,7 @@ class UserEcorideRepository extends UserRepository
      * @param array $data
      * @return UserEcoride
      */
-    private function mapDataToUser(array $data): UserEcoride
+    protected function mapDataToUser(array $data): UserEcoride
     {
         $user = new UserEcoride($data);
 

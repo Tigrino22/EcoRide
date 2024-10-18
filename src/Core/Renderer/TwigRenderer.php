@@ -2,11 +2,11 @@
 
 namespace Tigrino\Core\Renderer;
 
-use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\RendererInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class TwigRenderer implements RendererInteface
+class TwigRenderer implements RendererInterface
 {
     /**
      * @var Environment
@@ -35,6 +35,11 @@ class TwigRenderer implements RendererInteface
     public function addPath(string $path, ?string $namespace = null): void
     {
         $this->loader->addPath($path, $namespace);
+    }
+
+    public function getPath(string $name): array
+    {
+        return $this->loader->getPaths($name);
     }
 
     /**

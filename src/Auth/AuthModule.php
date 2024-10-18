@@ -8,7 +8,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Tigrino\Auth\Middleware\AuthMiddleware;
 use Tigrino\Core\App;
 use Tigrino\Core\Modules\ModuleInterface;
-use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Router\RouterInterface;
 
 class AuthModule implements ModuleInterface
@@ -38,8 +38,8 @@ class AuthModule implements ModuleInterface
         $this->app = &$app;
         $this->app->getRouter()->addRoutes(include __DIR__ . "/Config/Routes.php");
 
-        /** @var RendererInteface $renderer */
-        $renderer = $container->get(RendererInteface::class);
+        /** @var RendererInterface $renderer */
+        $renderer = $container->get(RendererInterface::class);
         $renderer->addPath(dirname(__DIR__, 2) . '/Templates/Auth', 'Auth');
 
         $this->addAuthMiddleware($container);

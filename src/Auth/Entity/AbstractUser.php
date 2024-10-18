@@ -43,9 +43,10 @@ class AbstractUser implements UserInterface
         return $this->password;
     }
 
-    public function setPassword(string $hasedPassword): bool
+    public function setPassword(string $password): bool
     {
-        $this->password = $hasedPassword;
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $this->password = $hashedPassword;
         return true;
     }
 }

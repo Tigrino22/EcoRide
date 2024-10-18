@@ -33,7 +33,7 @@ class TwigPathExtension extends AbstractExtension
      * @return string
      * @throws NotFoundException|ContainerExceptionInterface
      */
-    private function path(string $path, array $params = []): string
+    public function path(string $path, array $params = []): string
     {
         $params = [];
         try {

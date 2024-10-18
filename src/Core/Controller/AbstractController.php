@@ -6,7 +6,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\RendererInterface;
 
 abstract class AbstractController
 {
@@ -18,7 +18,7 @@ abstract class AbstractController
      * @var ContainerInterface
      */
     protected ContainerInterface $container;
-    private RendererInteface $renderer;
+    private RendererInterface $renderer;
 
     /**
      * Constructeur de base pour injecter le container.
@@ -28,7 +28,7 @@ abstract class AbstractController
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->renderer = $this->container->get(RendererInteface::class);
+        $this->renderer = $this->container->get(RendererInterface::class);
     }
 
     /**

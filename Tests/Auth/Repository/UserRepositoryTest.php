@@ -67,19 +67,36 @@ class UserRepositoryTest extends TestCase
         $this->repository->insert($user3);
     }
 
-    protected function tearDown(): void
-    {
-        $this->db->execute('DROP TABLE IF EXISTS users_roles');
-        $this->db->execute('DROP TABLE IF EXISTS roles');
-        $this->db->execute('DROP TABLE IF EXISTS users');
-    }
-
     public function testInsertUser()
     {
         $user = new User('test_user3', 'password123', 'test3@example.com');
 
         $result = $this->repository->insert($user);
-        $this->assertTrue($result);
+        $this->assertTrue((bool)$result);
+    }
+
+    public function testUpdateUser()
+    {
+        $user = new User('test_user3', 'password123', 'test3@example.com');
+        $this->repository->insert($user);
+        $user->setUsername('test_updated');
+        $result = $this->repository->update($user);
+        $this->assertTrue((bool)$result);
+        $this->assertEquals('test_updated', $result->getUsername());
+        $this->assertInstanceOf(User::class, $result);
+    }
+
+    public function testDeleteUser()
+    {
+        $user = new User('test_user3', 'password123', 'test3@example.com');
+
+        $this->repository->insert($user);
+        $this->assertTrue($this->repository->delete($user));
+
+        $this->repository->insert($user);
+        $this->assertTrue($this->repository->delete($user->getUuid()));
+
+        $this->repository->insert($user);
     }
 
     public function testFindByUsername()
@@ -114,7 +131,7 @@ class UserRepositoryTest extends TestCase
         $user->setUsername('test_user_modified');
 
         $result = $this->repository->update($user);
-        $this->assertTrue($result, "La mise à jour de l'utilisateur a échoué.");
+        $this->assertInstanceOf(User::class, $result);
 
         $updatedUser = $this->repository->findByUsername('test_user_modified');
         $this->assertNotNull(

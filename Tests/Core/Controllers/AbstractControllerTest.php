@@ -27,7 +27,7 @@ class AbstractControllerTest extends TestCase
         $request = new ServerRequest('GET', '/test');
 
         // Appel de la méthode 'execute' pour tester 'testAction'
-        $response = $controller->execute('testAction', [], $request);
+        $response = $controller->execute('AbstractControllerTestMethod', [], $request);
 
         // Vérification du type de réponse
         $this->assertInstanceOf(ResponseInterface::class, $response);

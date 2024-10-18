@@ -45,14 +45,30 @@ class TestController extends AbstractController
         ]);
     }
 
+    public function AbstractControllerTestMethod(): ResponseInterface
+    {
+        return new Response(200, [], "Test réussi");
+    }
+
     /**
-     * testAction pour test AbtractController
+     * 403 pour test AbtractController
      *
      * @return ResponseInterface
      */
-    public function testAction(): ResponseInterface
+    public function forbiddenTest(): ResponseInterface
     {
         // Simuler une réponse HTTP
-        return new Response(200, [], 'Test réussi');
+        return new Response(403, [], 'forbidden');
+    }
+
+    /**
+     * 404 pour test AbtractController
+     *
+     * @return ResponseInterface
+     */
+    public function notFoundTest(): ResponseInterface
+    {
+        // Simuler une réponse HTTP
+        return new Response(404, [], 'not found');
     }
 }

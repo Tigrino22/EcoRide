@@ -1,12 +1,12 @@
 <?php
 
-namespace Tigrino\App\Profil\Controller;
+namespace Tigrino\App\Profile\Controller;
 
 use GuzzleHttp\Psr7\Response;
 use Tigrino\Core\Controller\AbstractController;
 use Psr\Http\Message\ResponseInterface;
 
-class ProfilController extends AbstractController
+class ProfileController extends AbstractController
 {
     public function index(): ResponseInterface
     {

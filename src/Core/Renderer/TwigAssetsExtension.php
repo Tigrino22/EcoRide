@@ -66,16 +66,16 @@ class TwigAssetsExtension extends AbstractExtension
          * Partie du code à revoir servant à gérer le polyfiled pour éviter
          *
          */
-        if (!$this->polyfillLoaded && isset($_SERVER['HTTP_USER_AGENT'])) {
-            $userAgent = $_SERVER['HTTP_USER_AGENT'];
-            if (strpos($userAgent, 'Safari') && !strpos($userAgent, 'Chrome')) {
-                $this->polyfillLoaded = true;
-                $script = <<<HTML
-                    <script src="//unpkg.com/document-register-element" defer></script>
-                    $script
-                HTML;
-            }
-        }
+//        if (!$this->polyfillLoaded && isset($_SERVER['HTTP_USER_AGENT'])) {
+//            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+//            if (strpos($userAgent, 'Safari') && !strpos($userAgent, 'Chrome')) {
+//                $this->polyfillLoaded = true;
+//                $script = <<<HTML
+//                    <script src="//unpkg.com/document-register-element" defer></script>
+//                    $script
+//                HTML;
+//            }
+//        }
 
         return $script;
     }
@@ -111,10 +111,8 @@ class TwigAssetsExtension extends AbstractExtension
 
         if (strpos($name, '.css')) {
             $name = $this->getAssetPaths()['assets/ts/main.ts']['css'][0] ?? '';
-            var_dump($name);
         } else {
             $name = $this->getAssetPaths()['assets/ts/main.ts']['file'] ?? '';
-            var_dump($name);
         }
 
         return "assets/$name";

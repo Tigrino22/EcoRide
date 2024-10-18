@@ -5,7 +5,7 @@ namespace Tigrino\Errors;
 use Psr\Container\ContainerInterface;
 use Tigrino\Core\App;
 use Tigrino\Core\Modules\ModuleInterface;
-use Tigrino\Core\Renderer\RendererInteface;
+use Tigrino\Core\Renderer\RendererInterface;
 
 class ErrorModule implements ModuleInterface
 {
@@ -17,8 +17,8 @@ class ErrorModule implements ModuleInterface
         $this->app = &$app;
         $this->app->getRouter()->addRoutes(include __DIR__ . "/Config/Routes.php");
 
-        /** @var RendererInteface $renderer */
-        $renderer = $container->get(RendererInteface::class);
+        /** @var RendererInterface $renderer */
+        $renderer = $container->get(RendererInterface::class);
         $renderer->addPath(dirname(__DIR__, 2) . '/Templates/Errors', 'Errors');
     }
 }

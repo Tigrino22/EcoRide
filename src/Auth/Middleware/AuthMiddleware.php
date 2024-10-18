@@ -2,7 +2,6 @@
 
 namespace Tigrino\Auth\Middleware;
 
-use GuzzleHttp\Psr7\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -10,21 +9,18 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Tigrino\App\Ecoride\Entity\UserEcoride;
 use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
-use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\GuestUser;
 use Tigrino\Auth\Entity\User;
-use Tigrino\Auth\Entity\UserInterface;
 use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Router\Router;
 use Tigrino\Core\Session\SessionManager;
 use Tigrino\Core\Session\SessionManagerInterface;
-use Tigrino\Http\Errors\ForbiddenResponse;
 use Tigrino\Http\Response\RedirectResponse;
 
 class AuthMiddleware implements MiddlewareInterface
 {
     private Router $router;
-    private UserEcorideRepository $userRepository;
+    private UserRepository $userRepository;
     private SessionManagerInterface $sessionManager;
     private ContainerInterface $container;
 
@@ -33,7 +29,7 @@ class AuthMiddleware implements MiddlewareInterface
         $this->container = $container;
         $this->router = $this->container->get(Router::class);
         $this->userRepository = $userRepository ?? new UserEcorideRepository();
-        $this->sessionManager = $container->get(SessionManager::class);
+        $this->sessionManager = $this->container->get(SessionManager::class);
     }
 
     /**

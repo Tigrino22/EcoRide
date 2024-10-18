@@ -2,7 +2,7 @@
 
 namespace Tigrino\Core\Renderer;
 
-interface RendererInteface
+interface RendererInterface
 {
     /**
      * Renseigne le chemin des templates

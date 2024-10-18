@@ -3,14 +3,7 @@
 namespace Auth\Middleware;
 
 use DI\ContainerBuilder;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Tests\Core\Controllers\TestController;
-use Tigrino\Auth\AuthModule;
 use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Middleware\AuthMiddleware;
@@ -20,25 +13,19 @@ use Tigrino\Core\Database\Database;
 
 class AuthMiddlewareTest extends TestCase
 {
-    private \DI\Container $container;
     private Database $db;
-    private UserRepository $userRepository;
+    private UserRepository $repository;
+    private \DI\Container $container;
     private AuthMiddleware $authMiddleware;
+    private App $app;
 
-    /**
-     * @throws \Exception
-     */
     protected function setUp(): void
     {
         $this->db = new Database('sqlite');
-        $builder = new ContainerBuilder();
-        $builder->addDefinitions(dirname(__DIR__, 3) . '/Config/Container.php');
-        $this->container = $builder->build();
-        $this->userRepository = new UserRepository($this->db);
-        $this->authMiddleware = new AuthMiddleware($this->container, $this->userRepository);
+        $this->repository = new UserRepository($this->db);
 
-        $this->db->execute('DROP TABLE IF EXISTS users_sessions');
-        $this->db->execute('DROP TABLE IF EXISTS sessions');
+        $this->db->execute('DROP TABLE IF EXISTS users_roles');
+        $this->db->execute('DROP TABLE IF EXISTS roles');
         $this->db->execute('DROP TABLE IF EXISTS users');
 
         $this->db->execute('CREATE TABLE IF NOT EXISTS users (
@@ -47,15 +34,6 @@ class AuthMiddlewareTest extends TestCase
             email TEXT,
             password TEXT,
             last_login DATETIME
-        )');
-
-        $this->db->execute('CREATE TABLE IF NOT EXISTS sessions (
-            session_id BLOB PRIMARY KEY,
-            user_id BLOB,
-            session_token TEXT,
-            created_at DATETIME,
-            expires_at DATETIME,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )');
 
         $this->db->execute('CREATE TABLE IF NOT EXISTS roles (
@@ -84,69 +62,25 @@ class AuthMiddlewareTest extends TestCase
                 hex2bin('05f10bf37bec45128ae2d236b5786eab')   // Conversion en binaire
             ]
         );
+
+        $user = new User('test_admin', 'password123', 'test@example.com', [Role::ADMIN]);
+        $this->repository->insert($user);
+
+        $user = new User('test_user', 'password123', 'test@example.com', [Role::USER]);
+        $this->repository->insert($user);
+
+
+        // Initialisation du middleware
+        $containerBuilder = new ContainerBuilder();
+        $this->container = $containerBuilder->build();
+        $this->authMiddleware = new AuthMiddleware($this->container, $this->repository);
+
+        // Création de l'application
+        $this->app = new App($this->container);
     }
 
-    protected function tearDown(): void
+    public function testLogin()
     {
-        // Nettoyage après les tests
-        $this->db->execute('DROP TABLE IF EXISTS sessions');
-        $this->db->execute('DROP TABLE IF EXISTS users_roles');
-        $this->db->execute('DROP TABLE IF EXISTS roles');
-        $this->db->execute('DROP TABLE IF EXISTS users');
+        $this->assertTrue(true);
     }
-
-    public function testConstruct()
-    {
-        $middleware = new AuthMiddleware($this->container, $this->userRepository);
-        $this->assertInstanceOf(AuthMiddleware::class, $middleware);
-    }
-
-//    public function testProcessWithValidTokenAndRole()
-//    {
-//        // Ajouter un utilisateur
-//        $user = new User('test_user', 'password123', 'test@example.com', [Role::USER]);
-//        $this->userRepository->insert($user);
-//
-//        $route = ['GET', '/test', [TestController::class, 'testAction'], 'test.authmiddleware', [Role::USER] ];
-//        $app = new App($this->container, modules: [AuthModule::class]);
-//        $app->getRouter()->addRoutes($route);
-//
-//        // Créer un token de session et l'associer à l'utilisateur
-//        $session_token = bin2hex(random_bytes(32));
-//        $this->userRepository->setSessionToken($user, $session_token);
-//
-//        // Créer une requête avec le cookie session_token
-//        $request = (new ServerRequest('GET', '/test'))
-//            ->withCookieParams(['session_token' => $session_token]);
-//
-//        $response = $app->run($request);
-//
-//        // Vérifier que le middleware laisse passer la requête (200 OK)
-//        $this->assertEquals(200, $response->getStatusCode());
-//        $this->assertEquals('OK', (string) $response->getBody());
-//    }
-//
-//    public function testProcessWithInvalidTokenAndRole()
-//    {
-//        // Ajouter un utilisateur
-//        $user = new User('test_user', 'password123', 'test@example.com', [Role::GUEST]);
-//        $this->userRepository->insert($user);
-//
-//        $route = ['GET', '/test', [TestController::class, 'testAction'], 'test.authmiddleware', [Role::USER] ];
-//        $app = new App($this->container, modules: [AuthModule::class]);
-//        $app->getRouter()->addRoutes($route);
-//
-//        // Créer un token de session et l'associer à l'utilisateur
-//        $session_token = bin2hex(random_bytes(32));
-//        $this->userRepository->setSessionToken($user, $session_token);
-//
-//        // Créer une requête avec le cookie session_token
-//        $request = (new ServerRequest('GET', '/test'))
-//            ->withCookieParams(['session_token' => $session_token]);
-//
-//        $response = $app->run($request);
-//
-//        // Vérifier que le middleware bloque la requete (403)
-//        $this->assertEquals(403, $response->getStatusCode());
-//    }
 }

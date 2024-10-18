@@ -45,4 +45,12 @@ class PHPRendererTest extends TestCase
 
         $this->assertEquals("Hello Tigrino", $content);
     }
+
+    public function testRendererGetPath()
+    {
+        $this->renderer->addPath(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'Templates', 'blog');
+
+        $this->assertEquals(1, sizeof($this->renderer->getPaths()));
+        $this->assertArrayHasKey('blog', $this->renderer->getPaths());
+    }
 }

@@ -1,7 +1,7 @@
 import '../css/main.css';
 
 // @ts-ignore
-//import Turbolinks from 'turbolinks';
+// import Turbolinks from 'turbolinks';
 
 //import {register} from "./Resgiter";
 //import { initFlowbite } from 'flowbite'
@@ -13,9 +13,10 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // Modules ayant besoin d'être rechargés au changement de page (liens de navigation)
+//
 //document.addEventListener('turbolinks:load', () => {
-   //dropdown();
-    //register();
-//});
+//   dropdown();
+   // register();
+// });
 
-//Turbolinks.start();
+// Turbolinks.start();

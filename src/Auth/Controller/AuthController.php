@@ -5,22 +5,23 @@ namespace Tigrino\Auth\Controller;
 use GuzzleHttp\Psr7\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Tigrino\App\Ecoride\Entity\UserEcoride;
-use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
+use Tigrino\Auth\Entity\User;
+use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Controller\AbstractController;
 use Tigrino\Core\Session\SessionManager;
 use Tigrino\Http\Response\JsonResponse;
+use Tigrino\Http\Response\RedirectResponse;
 
 class AuthController extends AbstractController
 {
-    private UserEcorideRepository $userRepository;
+    private UserRepository $userRepository;
     private SessionManager $sessionManager;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->userRepository = new UserEcorideRepository();
-        $this->sessionManager = new SessionManager();
+        $this->sessionManager = $container->get(SessionManager::class);
+        $this->userRepository = $container->get(UserRepository::class);
     }
 
     public function register(): ResponseInterface
@@ -35,7 +36,10 @@ class AuthController extends AbstractController
                 );
             }
 
-            $user = new UserEcoride($data);
+            $user = new User(
+                username: $data['username'],
+                password: $data['password'],
+            );
 
             if (!$this->userRepository->insert($user)) {
                 return new JsonResponse(
@@ -44,16 +48,11 @@ class AuthController extends AbstractController
                 );
             } else {
                 // rediriger vers la page Login avec le champ email
-                // déja remplie
-
 
                 $content = $this->render("@Auth/login", ['user' => $user]);
 
                 $response = new Response(body: $content);
-                $response->withStatus(303);
-                $response->withHeader('Location', '/login');
-
-                return $response;
+                return $response->withStatus(303)->withHeader('Location', '/login');
             }
         }
 
@@ -72,14 +71,14 @@ class AuthController extends AbstractController
         if ($this->request->getMethod() === "POST") {
             $data = $this->request->getParsedBody();
 
-            if (!$data['email'] || !$data['password']) {
+            if (!$data['username'] || !$data['password']) {
                 return JsonResponse::create(data: ['message' => 'Identifiants manquant']);
             }
 
-            $user = $this->userRepository->findByEmail($data['email']);
+            $user = $this->userRepository->findByUsername($data['username']);
             if (!$user) {
                 return JsonResponse::create(
-                    data: ['message' => 'Aucun utilisateur trouvé pour cet email']
+                    data: ['message' => 'Aucun utilisateur trouvé pour cet username']
                 );
             }
 
@@ -92,13 +91,7 @@ class AuthController extends AbstractController
             $this->sessionManager->set('user', [
                 'id' => $user->getUuid(),
                 'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'name' => $user->getName(),
-                'firstname' => $user->getFirstname(),
-                'telephone' => $user->getTelephone(),
-                'address' => $user->getAddress(),
-                'birthday' => $user->getBirthday(),
-                'photo' => $user->getPhoto(),
+                'email' => $user->getEmail()
             ]);
 
             return new Response(
@@ -122,10 +115,8 @@ class AuthController extends AbstractController
     {
         $this->sessionManager->remove('user');
 
-        return new Response(
-            status: 200,
-            headers: ['Location' => '/'],
-            body: $this->render('@Home/home')
+        return RedirectResponse::create(
+            $this->container->get('router')->generate('home')
         );
     }
 }
