@@ -1,8 +1,7 @@
 <?php
 
-namespace Tigrino\App\Ecoride\Entity;
+namespace Tigrino\App\Profile\Entity;
 
-use DateTime;
 use Tigrino\Auth\Entity\User;
 
 class UserEcoride extends User

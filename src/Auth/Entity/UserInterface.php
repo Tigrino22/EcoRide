@@ -13,5 +13,5 @@ interface UserInterface
     public function setUsername(string $username): void;
 
     public function getPassword(): string;
-    public function setPassword(string $hasedPassword): bool;
+    public function setPassword(string $password): void;
 }

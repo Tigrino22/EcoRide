@@ -3,7 +3,7 @@
 namespace Ecoride\Entity;
 
 use PHPUnit\Framework\TestCase;
-use Tigrino\App\Ecoride\Entity\UserEcoride;
+use Tigrino\App\Profile\Entity\UserEcoride;
 
 class UserEcorideTest extends TestCase
 {

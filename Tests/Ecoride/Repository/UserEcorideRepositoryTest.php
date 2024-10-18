@@ -3,9 +3,8 @@
 namespace Ecoride\Repository;
 
 use PHPUnit\Framework\TestCase;
-use Tigrino\App\Ecoride\Entity\UserEcoride;
-use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
-use Tigrino\Auth\Entity\User;
+use Tigrino\App\Profile\Entity\UserEcoride;
+use Tigrino\App\Profile\Repository\UserEcorideRepository;
 use Tigrino\Core\Database\Database;
 
 class UserEcorideRepositoryTest extends TestCase

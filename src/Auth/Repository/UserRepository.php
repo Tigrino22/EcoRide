@@ -104,7 +104,7 @@ class UserRepository
         return null;
     }
 
-    public function findById(Uuid $id): ?User
+    public function findById(UuidInterface $id): ?User
     {
         $query = 'SELECT * FROM users WHERE id = :id';
         $params = [':id' => $id->getBytes()];

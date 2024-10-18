@@ -6,8 +6,8 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . "/../src/Core/Misc/utils.php";
 
-use Tigrino\App\Ecoride\Entity\UserEcoride;
-use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
+use Tigrino\App\Profile\Entity\UserEcoride;
+use Tigrino\App\Profile\Repository\UserEcorideRepository;
 use Tigrino\Auth\Config\Role;
 use Tigrino\Core\Database\Database;
 
@@ -42,6 +42,8 @@ while (true) {
     }
     colorLog("Erreur lors de la confirmation du mot de passe, veulliez recommencer.\n");
 }
+
+$password = password_hash($password, PASSWORD_DEFAULT);
 
 $user = new UserEcoride([
     'username' => $username,

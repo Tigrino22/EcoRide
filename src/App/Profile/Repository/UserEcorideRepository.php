@@ -1,10 +1,9 @@
 <?php
 
-namespace Tigrino\App\Ecoride\Repository;
+namespace Tigrino\App\Profile\Repository;
 
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
-use Tigrino\App\Ecoride\Entity\UserEcoride;
+use Tigrino\App\Profile\Entity\UserEcoride;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Database\Database;

@@ -4,13 +4,7 @@ namespace Tigrino\App\Ecoride\Controller;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use Tigrino\App\Ecoride\Entity\UserEcoride;
-use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
-use Tigrino\Auth\Config\Role;
-use Tigrino\Auth\Entity\User;
-use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Controller\AbstractController;
-use Tigrino\Http\Response\JsonResponse;
 
 class HomeController extends AbstractController
 {

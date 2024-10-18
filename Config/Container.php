@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Container\ContainerInterface;
+
 use function DI\env;
 use function DI\factory;
 use function DI\autowire;
@@ -17,5 +19,5 @@ return [
 
     RendererInterface::class => factory(TwigRendererFactory::class),
     Router::class => autowire(Router::class),
-    AuthController::class => autowire()
+    AuthController::class => autowire(AuthController::class)
 ];

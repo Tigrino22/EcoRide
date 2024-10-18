@@ -7,8 +7,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Tigrino\App\Ecoride\Entity\UserEcoride;
-use Tigrino\App\Ecoride\Repository\UserEcorideRepository;
 use Tigrino\Auth\Entity\GuestUser;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
@@ -28,7 +26,7 @@ class AuthMiddleware implements MiddlewareInterface
     {
         $this->container = $container;
         $this->router = $this->container->get(Router::class);
-        $this->userRepository = $userRepository ?? new UserEcorideRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
         $this->sessionManager = $this->container->get(SessionManager::class);
     }
 
@@ -61,10 +59,11 @@ class AuthMiddleware implements MiddlewareInterface
                      */
                     if ($this->sessionManager->has('user')) {
                         $id = $this->sessionManager->get('user')['id'];
-                        try {
 
-                            /** @var UserEcoride $user */
+                        try {
+                            /** @var User $user */
                             $user = $this->userRepository->findById($id);
+
                         } catch (\Exception $e) {
                             echo "L'utilisateur n'a pas pu être retrouver : $id | Message : " . $e->getMessage();
                         }

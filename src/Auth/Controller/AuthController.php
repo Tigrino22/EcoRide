@@ -8,14 +8,15 @@ use Psr\Http\Message\ResponseInterface;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Controller\AbstractController;
+use Tigrino\Core\Router\Router;
 use Tigrino\Core\Session\SessionManager;
 use Tigrino\Http\Response\JsonResponse;
 use Tigrino\Http\Response\RedirectResponse;
 
 class AuthController extends AbstractController
 {
-    private UserRepository $userRepository;
-    private SessionManager $sessionManager;
+    protected UserRepository $userRepository;
+    protected SessionManager $sessionManager;
 
     public function __construct(ContainerInterface $container)
     {
@@ -38,7 +39,7 @@ class AuthController extends AbstractController
 
             $user = new User(
                 username: $data['username'],
-                password: $data['password'],
+                password: password_hash($data['password'], PASSWORD_DEFAULT),
             );
 
             if (!$this->userRepository->insert($user)) {
@@ -116,7 +117,7 @@ class AuthController extends AbstractController
         $this->sessionManager->remove('user');
 
         return RedirectResponse::create(
-            $this->container->get('router')->generate('home')
+            $this->container->get(Router::class)->generate('home')
         );
     }
 }

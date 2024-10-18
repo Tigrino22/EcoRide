@@ -15,7 +15,7 @@ class AbstractUser implements UserInterface
     {
         $this->uuid = Uuid::uuid4();
         $this->username = $username;
-        $this->password = password_hash($password, PASSWORD_BCRYPT);
+        $this->password = $password;
     }
 
     public function getUuid(): UuidInterface
@@ -43,10 +43,8 @@ class AbstractUser implements UserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): bool
+    public function setPassword(string $password): void
     {
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $this->password = $hashedPassword;
-        return true;
+        $this->password = $password;
     }
 }
