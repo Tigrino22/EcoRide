@@ -7,7 +7,6 @@ use Twig\TwigFunction;
 
 class TwigSessionExtension extends AbstractExtension
 {
-
     public function getFunctions(): array
     {
         return [

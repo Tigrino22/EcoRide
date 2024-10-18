@@ -7,7 +7,6 @@ use Tigrino\Core\Router\Exception\ControllerException;
 
 class ControllerExceptionTest extends TestCase
 {
-
     public function testExceptionMessage(): void
     {
         $this->expectException(ControllerException::class);
@@ -33,6 +32,4 @@ class ControllerExceptionTest extends TestCase
         $this->assertSame('Controller error', $exception->getMessage());
         $this->assertSame(500, $exception->getCode());
     }
-
-
 }

@@ -21,4 +21,3 @@ class AdminModule implements ModuleInterface
         $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Admin', 'Admin');
     }
 }
-

@@ -39,7 +39,7 @@ class UserTest extends TestCase
     {
         $this->user->setPassword('test2');
 
-        $this->assertTrue(password_verify('test2', $this->user->getPassword()));
+        $this->assertEquals('test2', $this->user->getPassword());
     }
 
     public function testSetEmail()

@@ -9,7 +9,6 @@ use Tigrino\Core\Renderer\RendererInterface;
 
 class ErrorModule implements ModuleInterface
 {
-
     private App $app;
 
     public function __construct(App &$app, ContainerInterface $container)

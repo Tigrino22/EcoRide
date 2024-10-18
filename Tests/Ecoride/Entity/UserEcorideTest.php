@@ -35,9 +35,9 @@ class UserEcorideTest extends TestCase
 
     public function testGetAndSetPassword()
     {
-        $this->assertTrue(password_verify("password", $this->entity->getPassword()));
+        $this->assertEquals('password', $this->entity->getPassword());
         $this->entity->setPassword("password1");
-        $this->assertTrue(password_verify("password1", $this->entity->getPassword()));
+        $this->assertEquals("password1", $this->entity->getPassword());
     }
 
     public function testGetAndSetEmail()

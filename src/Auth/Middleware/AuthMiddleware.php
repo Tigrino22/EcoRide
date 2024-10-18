@@ -63,7 +63,6 @@ class AuthMiddleware implements MiddlewareInterface
                         try {
                             /** @var User $user */
                             $user = $this->userRepository->findById($id);
-
                         } catch (\Exception $e) {
                             echo "L'utilisateur n'a pas pu être retrouver : $id | Message : " . $e->getMessage();
                         }

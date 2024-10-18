@@ -1,5 +1,7 @@
 <?php
 
+namespace Core\Renderer;
+
 use PHPUnit\Framework\TestCase;
 use Tigrino\Core\Renderer\TwigRenderer;
 use Twig\Environment;

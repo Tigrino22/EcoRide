@@ -33,7 +33,11 @@ class HomeController extends AbstractController
     public function admin(): ResponseInterface
     {
         $title = 'Admin';
-        $description = "Gérez les utilisateurs, les contenus et les paramètres du site avec facilité. Utilisez les outils ci-dessous pour administrer toutes les sections de votre application.";
+        $description =
+            "Gérez les utilisateurs, 
+            les contenus et les paramètres du site avec facilité. 
+            Utilisez les outils ci-dessous pour administrer 
+            toutes les sections de votre application.";
 
         $content = compact('title', 'description');
         return new Response(

@@ -45,7 +45,7 @@ class TestController extends AbstractController
         ]);
     }
 
-    public function AbstractControllerTestMethod(): ResponseInterface
+    public function abstractControllerTestMethod(): ResponseInterface
     {
         return new Response(200, [], "Test réussi");
     }

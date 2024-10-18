@@ -19,8 +19,30 @@ class UserEcorideRepository extends UserRepository
     {
         // Insertion d'un nouvel utilisateur
         $query = 'INSERT INTO users 
-            (id, username, name, firstname, email, password, telephone, address, birthday, photo, created_at, updated_at) 
-            VALUES (:id, :username, :name, :firstname, :email, :password, :telephone, :address, :birthday, :photo, :created_at, :updated_at)';
+            (id, 
+             username, 
+             name, 
+             firstname, 
+             email, 
+             password, 
+             telephone, 
+             address, 
+             birthday, 
+             photo, 
+             created_at, 
+             updated_at) 
+            VALUES (:id, 
+                    :username, 
+                    :name, 
+                    :firstname, 
+                    :email, 
+                    :password, 
+                    :telephone, 
+                    :address, 
+                    :birthday, 
+                    :photo, 
+                    :created_at, 
+                    :updated_at)';
 
         $params = [
             ':id' => $user->getUuid()->getBytes(), // UUID en format binaire
