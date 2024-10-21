@@ -30,6 +30,10 @@ class App
      *  @var ModuleInterface[]
      */
     private array $modules = [];
+
+    /**
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
 
     /**

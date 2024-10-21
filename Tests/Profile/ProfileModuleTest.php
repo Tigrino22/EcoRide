@@ -4,7 +4,7 @@ namespace Profile;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Tigrino\App\Profile\ProfilModule;
+use Tigrino\App\Profile\ProfileModule;
 use Tigrino\Core\App;
 use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Router\RouterInterface;
@@ -44,6 +44,6 @@ class ProfileModuleTest extends TestCase
             ->willReturn($this->renderer);
 
         // Instanciation du module
-        new ProfilModule($this->app, $this->container);
+        new ProfileModule($this->app, $this->container);
     }
 }

@@ -10,7 +10,7 @@ class ProfileController extends AbstractController
 {
     public function index(): ResponseInterface
     {
-          $content = $this->render('@Profil/Profil');
+          $content = $this->render('@Profile/Profile');
 
           return new Response(
               200,

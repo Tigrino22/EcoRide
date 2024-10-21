@@ -7,7 +7,7 @@ use Tigrino\Core\App;
 use Tigrino\Core\Modules\ModuleInterface;
 use Tigrino\Core\Renderer\RendererInterface;
 
-class ProfilModule implements ModuleInterface
+class ProfileModule implements ModuleInterface
 {
     private App $app;
 
@@ -18,6 +18,6 @@ class ProfilModule implements ModuleInterface
 
         /** @var RendererInterface $renderer */
         $renderer = $container->get(RendererInterface::class);
-        $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Profil', 'Profil');
+        $renderer->addPath(dirname(__DIR__, 3) . '/Templates/Profile', 'Profile');
     }
 }

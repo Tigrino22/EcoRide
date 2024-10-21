@@ -34,7 +34,7 @@ class PHPRenderer implements RendererInterface
     }
 
     /**
-     * Rend un vue :
+     * Rend une vue :
      *  - "view"
      *  - "@namespace/view"
      *

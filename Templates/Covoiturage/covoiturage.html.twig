@@ -10,7 +10,7 @@
                 </span>
             </h1>
 
-            {% if not search %}
+            {% if search %}
                 {#
                     Quand aucune recherche n'a encore été lancée.
                 #}
@@ -44,7 +44,7 @@
                     le listing est affiché
                 #}
 
-                <h2 class="max-w-3xl text-3xl lg:text-4xl mx-auto mt-6 text-center text-gray-700 dark:text-white">Voici les trajets trouvés :</h2>
+                <h2 class="max-w-3xl text-3xl lg:text-4xl mx-auto mt-6 text-center text-gray-700 dark:text-white">Voici les trajets trouvés de <span class="font-semibold">Origine</span> à <span class="font-semibold">Desitnation</span>:</h2>
 
                 {% include '@Covoiturage/liste_covoiturage.html.twig' %}
 

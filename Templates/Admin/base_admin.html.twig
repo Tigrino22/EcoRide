@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title "EcoRide" %}</title>
+
+    {# VITE #}
+    {{ vite_entry_script_tags('main') }}
+    {{ vite_entry_link_tags('main') }}
+
+
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+<!-- component -->
+
+{% include '@__main__/Partials/Header.html.twig' %}
+
+<main class="flex-grow content-center my-16 container mx-auto px-4 py-10 w-full">
+
+    {% include '@Admin/Sidebar.html.twig' %}
+
+    {% block body %}
+    {% endblock %}
+</main>
+
+{# FOOTER #}
+
+{% include '@__main__/Partials/Footer.html.twig' %}
+
+</body>
+</html>
