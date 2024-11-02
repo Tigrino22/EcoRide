@@ -9,7 +9,7 @@ use Tigrino\Core\Database\DatabaseInterface;
 
 class Database implements DatabaseInterface
 {
-    private PDO $pdo;
+    private ?PDO $pdo = null;
     public function __construct($dbType = 'mysql')
     {
 
@@ -32,15 +32,17 @@ class Database implements DatabaseInterface
             $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4;port=$port";
 
             try {
-                $this->pdo = new PDO($dsn, $user, $password);
+                if ($this->pdo === null) {
+                    $this->pdo = new PDO($dsn, $user, $password);
+
+                    $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+                    $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                }
             } catch (PDOException $e) {
                 echo "Erreur de connexion à la base de données : " . $e->getMessage();
             }
         }
-
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     }
 
     /**

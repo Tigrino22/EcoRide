@@ -1,9 +1,9 @@
 import '../css/main.css';
 
 import { initFlowbite } from 'flowbite'
-import {dropdown} from "./Dropdown";
+import {bootDropdown} from "./dropdown/Dropdown";
 
 window.addEventListener('DOMContentLoaded', () => {
     initFlowbite();
-   dropdown();
+    bootDropdown()
 });

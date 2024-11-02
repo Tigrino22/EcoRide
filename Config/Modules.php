@@ -7,12 +7,12 @@
 use Tigrino\App\Ecoride\EcorideModule;
 use Tigrino\Auth\AuthModule;
 use Tigrino\Errors\ErrorModule;
-use Tigrino\App\Profile\ProfilModule;
+use Tigrino\App\Profile\ProfileModule;
 use Tigrino\App\Admin\AdminModule;
 
 return [
     AdminModule::class,
-    ProfilModule::class,
+    ProfileModule::class,
     EcorideModule::class,
     AuthModule::class,
     ErrorModule::class,

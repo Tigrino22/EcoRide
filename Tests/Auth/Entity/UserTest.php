@@ -25,14 +25,14 @@ class UserTest extends TestCase
 
     public function testGetAndSetId()
     {
-        $uuid = $this->user->getUuid();
+        $uuid = $this->user->getId();
 
         $this->assertInstanceOf(UuidInterface::class, $uuid);
 
         $new_uuid = Uuid::uuid4();
-        $this->user->setUuid($new_uuid);
+        $this->user->setId($new_uuid);
 
-        $this->assertEquals($new_uuid, $this->user->getUuid());
+        $this->assertEquals($new_uuid, $this->user->getId());
     }
 
     public function testSetPassword()

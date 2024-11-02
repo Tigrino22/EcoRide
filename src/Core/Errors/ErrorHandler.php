@@ -6,12 +6,12 @@ use Throwable;
 
 class ErrorHandler
 {
-    private string $logDir;
+    private static string $logDir;
 
     public function __construct()
     {
         $baseDir = dirname(__DIR__, 3);
-        $this->logDir = $baseDir . DIRECTORY_SEPARATOR . "Logs" . DIRECTORY_SEPARATOR;
+        self::$logDir = $baseDir . DIRECTORY_SEPARATOR . "Logs" . DIRECTORY_SEPARATOR;
     }
 
     public function register(): void
@@ -32,28 +32,49 @@ class ErrorHandler
         http_response_code(500);
     }
 
-    private function logError(int $level, string $message, string $file, int $line): void
+    public static function logMessage(string $message, string $level = 'INFO'): void
     {
-        $this->checkDir($this->logDir, $this->logDir . "errors.log");
+        $logFile = self::$logDir . "app.log";
+        self::checkDir(self::$logDir, $logFile);
 
         $logMessage = sprintf(
-            "[%s] ERROR: %s\n",
+            "[%s] %s: %s\n",
             date('Y-m-d H:i:s'),
-            "Level: $level | Message: $message | File: $file | Line: $line"
+            strtoupper($level),
+            $message
         );
-        file_put_contents($this->logDir . "errors.log", $logMessage, FILE_APPEND);
+        file_put_contents($logFile, $logMessage, FILE_APPEND);
+    }
+
+    private function logError(int $level, string $message, string $file, int $line): void
+    {
+        $logFile = self::$logDir . "errors.log";
+        self::checkDir(self::$logDir, $logFile);
+
+        $logMessage = sprintf(
+            "[%s] ERROR: Level: %d | Message: %s | File: %s | Line: %d\n",
+            date('Y-m-d H:i:s'),
+            $level,
+            $message,
+            $file,
+            $line
+        );
+        file_put_contents($logFile, $logMessage, FILE_APPEND);
     }
 
     private function logException(Throwable $exception): void
     {
-        $this->checkDir($this->logDir, $this->logDir . "errors.log");
+        $logFile = self::$logDir . "errors.log";
+        self::checkDir(self::$logDir, $logFile);
 
         $exceptionMessage = sprintf(
-            "[%s] EXCEPTION: %s\n",
+            "[%s] EXCEPTION: %s | File: %s | Line: %d\n",
             date('Y-m-d H:i:s'),
-            "{$exception->getMessage()} | File: {$exception->getFile()} | Line: {$exception->getLine()}"
+            $exception->getMessage(),
+            $exception->getFile(),
+            $exception->getLine()
         );
-        file_put_contents($this->logDir . "errors.log", $exceptionMessage, FILE_APPEND);
+        file_put_contents($logFile, $exceptionMessage, FILE_APPEND);
     }
 
     /**
@@ -63,7 +84,7 @@ class ErrorHandler
      * @param string $logFile
      * @return void
      */
-    private function checkDir(string $logDir, string $logFile): void
+    private static function checkDir(string $logDir, string $logFile): void
     {
         if (!is_dir($logDir)) {
             mkdir($logDir, 0777, true);

@@ -9,23 +9,23 @@ class AbstractUser implements UserInterface
 {
     protected string $username;
     protected string $password;
-    private UuidInterface $uuid;
+    private UuidInterface $id;
 
     public function __construct(string $username, string $password)
     {
-        $this->uuid = Uuid::uuid4();
+        $this->id = Uuid::uuid4();
         $this->username = $username;
         $this->password = $password;
     }
 
-    public function getUuid(): UuidInterface
+    public function getId(): UuidInterface
     {
-        return $this->uuid;
+        return $this->id;
     }
 
-    public function setUuid(UuidInterface $uuid): void
+    public function setId(UuidInterface $uuid): void
     {
-        $this->uuid = $uuid;
+        $this->id = $uuid;
     }
 
     public function getUsername(): string

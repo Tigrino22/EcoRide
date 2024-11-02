@@ -95,7 +95,7 @@ class AuthController extends AuthControllerFramwork
             }
 
             $this->sessionManager->set('user', [
-                'id' => $user->getUuid(),
+                'id' => $user->getId(),
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
                 'name' => $user->getName(),

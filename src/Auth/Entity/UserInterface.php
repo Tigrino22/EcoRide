@@ -6,8 +6,8 @@ use Ramsey\Uuid\UuidInterface;
 
 interface UserInterface
 {
-    public function getUuid(): UuidInterface;
-    public function setUuid(UuidInterface $uuid): void;
+    public function getId(): UuidInterface;
+    public function setId(UuidInterface $uuid): void;
 
     public function getUsername(): string;
     public function setUsername(string $username): void;

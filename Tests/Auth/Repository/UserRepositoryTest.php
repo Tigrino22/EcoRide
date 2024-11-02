@@ -94,7 +94,7 @@ class UserRepositoryTest extends TestCase
         $this->assertTrue($this->repository->delete($user));
 
         $this->repository->insert($user);
-        $this->assertTrue($this->repository->delete($user->getUuid()));
+        $this->assertTrue($this->repository->delete($user->getId()));
 
         $this->repository->insert($user);
     }

@@ -5,12 +5,16 @@ namespace Tigrino\App\Ecoride\Controller;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Tigrino\Core\Controller\AbstractController;
+use Tigrino\Core\Session\SessionManager;
 
 class HomeController extends AbstractController
 {
     public function index(): ResponseInterface
     {
         $content = $this->render('@Home/home');
+
+//        var_dump($this->container->get(SessionManager::class)->get('user'));
+//        die();
 
         return new Response(
             200,

@@ -45,7 +45,7 @@ class UserEcorideRepository extends UserRepository
                     :updated_at)';
 
         $params = [
-            ':id' => $user->getUuid()->getBytes(), // UUID en format binaire
+            ':id' => $user->getId()->getBytes(), // UUID en format binaire
             ':username' => $user->getUsername(),
             ':name' => $user->getName(),
             ':firstname' => $user->getFirstname(),
@@ -79,7 +79,7 @@ class UserEcorideRepository extends UserRepository
             WHERE id = :id';
 
         $params = [
-            ':id' => $user->getUuid()->getBytes(), // UUID en format binaire si nécessaire
+            ':id' => $user->getId()->getBytes(), // UUID en format binaire si nécessaire
             ':username' => $user->getUsername(),
             ':name' => $user->getName(),
             ':firstname' => $user->getFirstname(),
@@ -106,7 +106,7 @@ class UserEcorideRepository extends UserRepository
     {
         $user = new UserEcoride($data);
 
-        $user->setUuid(Uuid::fromBytes($data['id']));
+        $user->setId(Uuid::fromBytes($data['id']));
         $user->setUsername($data['username']);
         $user->setName($data['name']);
         $user->setFirstname($data['firstname']);

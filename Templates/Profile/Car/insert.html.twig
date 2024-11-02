@@ -1,0 +1,86 @@
+{% extends '@__main__/base.html.twig' %}
+
+{% block body %}
+
+    {% if errors %}
+        {% for error in errors %}
+            <div class="w-full text-red-500 border-red-500 border-2 rounded-md p-4 mb-4">{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <h1 class="text-2xl md:text-3xl font-semibold text-center">Enregistrement d'un véhicule pour <span class="underline">{{ session('user').username }}</span></h1>
+
+    <div class="flex flex-col my-8 md:my-12">
+        <form method="post">
+        {# Forumulaire insertion véhicule #}
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="plateOfRegistration">
+                    Immatriculation :
+                </label>
+                <input
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="plateOfRegistration" name="plateOfRegistration" type="text">
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="first_registration_at">
+                    Date de mise en circulation :
+                </label>
+                <input
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="first_registration_at" name="firstRegistrationAt" type="date">
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="brand">
+                    Marque :
+                </label>
+                <input
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="brand" name="brand" type="text">
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="model">
+                    Modèle :
+                </label>
+                <input
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="model" name="model" type="text">
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="color">
+                    Couleur :
+                </label>
+                <input
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="color" name="color" type="text">
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="places">
+                    Nombre de places :
+                </label>
+                <input
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="places" name="places" type="number">
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="preferences">
+                    Vos préférences (Fumeur/Non-fumeur ...) :
+                </label>
+                <textarea
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="preferences" name="preferences"></textarea>
+            </div>
+
+
+            <!-- Bouton pour ajouter un véhicule -->
+            <div class="flex justify-end mb-4">
+                <button type="submit"
+                   class="
+                    bg-gradient-to-tl from-teal-300 to-cyan-600 text-white px-4 py-2
+                    rounded-md shadow-md hover:bg-gradient-to-tl hover:from-teal-500 hover:to-cyan-800
+                ">
+                    Ajouter le véhicule
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

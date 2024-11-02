@@ -1,0 +1,16 @@
+{% extends '@__main__/base.html.twig' %}
+
+{% block body %}
+
+    <h1>Voici les véhicules enregistrés sur votre compte {{ session('user').username }}</h1>
+
+
+
+    <!-- Bouton pour ajouter un véhicule -->
+    <div class="flex justify-start mb-4">
+        <a href="{{ path('car.insert') }}"
+           class="bg-gradient-to-tl from-teal-300 to-cyan-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-gradient-to-tl hover:from-teal-500 hover:to-cyan-800">
+            Ajouter un véhicule
+        </a>
+    </div>
+{% endblock %}

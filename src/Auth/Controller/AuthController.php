@@ -90,7 +90,7 @@ class AuthController extends AbstractController
             }
 
             $this->sessionManager->set('user', [
-                'id' => $user->getUuid(),
+                'id' => $user->getId(),
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail()
             ]);

@@ -1,11 +1,12 @@
 <?php
 
-use Psr\Container\ContainerInterface;
 
 use function DI\env;
 use function DI\factory;
 use function DI\autowire;
 
+use Tigrino\App\Profile\Repository\UserEcorideRepository;
+use Tigrino\Services\SerializerService;
 use Tigrino\Core\Router\Router;
 use Tigrino\Auth\Controller\AuthController;
 use Tigrino\Core\Renderer\RendererInterface;
@@ -19,5 +20,9 @@ return [
 
     RendererInterface::class => factory(TwigRendererFactory::class),
     Router::class => autowire(Router::class),
-    AuthController::class => autowire(AuthController::class)
+    AuthController::class => autowire(AuthController::class),
+    SerializerService::class => autowire(SerializerService::class),
+
+    // Ecoride
+    UserEcorideRepository::class => autowire(UserEcorideRepository::class)
 ];

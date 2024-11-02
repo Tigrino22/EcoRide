@@ -25,7 +25,7 @@ class UserRepository
             (id, username, email, password) 
             VALUES (:id, :username, :email, :password)';
         $params = [
-            ':id' => $user->getUuid()->getBytes(),
+            ':id' => $user->getId()->getBytes(),
             ':username' => $user->getUsername(),
             ':email' => $user->getEmail(),
             ':password' => $user->getPassword(),
@@ -43,7 +43,7 @@ class UserRepository
             last_login = :last_login
             WHERE id = :id';
         $params = [
-            ':id' => $user->getUuid()->getBytes(),
+            ':id' => $user->getId()->getBytes(),
             ':username' => $user->getUsername(),
             ':email' => $user->getEmail(),
             ':last_login' => $user->getLastLogin()
@@ -63,7 +63,7 @@ class UserRepository
                 ];
             } elseif ($param instanceof User) {
                 $params = [
-                    ':id' => $param->getUuid()->getBytes(),
+                    ':id' => $param->getId()->getBytes(),
                 ];
             } else {
                 throw new Exception(
@@ -129,7 +129,7 @@ class UserRepository
     public function setRole(User $user, array $roles): bool|User
     {
         // Récupérer l'utilisateur
-        $user_id = $user->getUuid()->getBytes();
+        $user_id = $user->getId()->getBytes();
 
         // Delete existing roles for the user to avoid duplicates
         $deleteQuery = '
@@ -200,7 +200,7 @@ class UserRepository
             return [Role::GUEST];
         }
 
-        $userId = $user->getUuid()->getBytes();
+        $userId = $user->getId()->getBytes();
 
         // Récupération de tous les rôles de la table roles
         $query = "
@@ -242,7 +242,7 @@ class UserRepository
             lastLogin: $data['last_login']
         );
 
-        $user->setUuid(Uuid::fromBytes($data['id']));
+        $user->setId(Uuid::fromBytes($data['id']));
         $user->setRoles($this->getRoles($user));
 
         return $user;
