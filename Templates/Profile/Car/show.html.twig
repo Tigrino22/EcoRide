@@ -2,9 +2,47 @@
 
 {% block body %}
 
-    <h1>Voici les véhicules enregistrés sur votre compte {{ session('user').username }}</h1>
+    <h1 class="text-2xl md:text-3xl font-semibold text-center">Voici les véhicules enregistrés sur votre compte {{ session('user').username }}</h1>
 
-
+    <div class="mt-12 my-4 overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">Immatriculation</th>
+                    <th scope="col" class="px-6 py-3">Marque</th>
+                    <th scope="col" class="px-6 py-3">Modèle</th>
+                    <th scope="col" class="px-6 py-3">Places</th>
+                    <th scope="col" class="px-6 py-3">Date de mise en circulation</th>
+                    <th scope="col" class="px-6 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for car in cars %}
+                    <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            {{ car.plate_of_registration }}</th>
+                        <td class="px-6 py-4">{{ car.brand}}</td>
+                        <td class="px-6 py-4">{{ car.model}}</td>
+                        <td class="px-6 py-4">{{ car.places}}</td>
+                        <td class="px-6 py-4">{{ car.first_registration_at|date("d M Y")}}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <a href="{{ path('car.update', {'id' : car.id}) }}"
+                                   class="px-2 py-1 shadow-md rounded-md text-white bg-teal-400
+                                transition-colors duration-300 hover:bg-teal-700 ">Modifier</a>
+                                <form action="{{ path('car.delete', {'id' : car.id}) }}" method="POST" class="inline-block">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" id="js_car_delete_{{ car.id }}"
+                                        class="px-2 py-1 shadow-md rounded-md text-white bg-red-400
+                                transition-colors duration-300 hover:bg-red-700 ">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <!-- Bouton pour ajouter un véhicule -->
     <div class="flex justify-start mb-4">

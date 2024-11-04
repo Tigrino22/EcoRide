@@ -6,6 +6,7 @@ use DI\NotFoundException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Tigrino\Core\Misc\VarDumper;
 use Tigrino\Core\Router\Router;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -35,7 +36,6 @@ class TwigPathExtension extends AbstractExtension
      */
     public function path(string $path, array $params = []): string
     {
-        $params = [];
         try {
             return $this->container->get(Router::class)->generate($path, $params);
         } catch (NotFoundExceptionInterface $e) {

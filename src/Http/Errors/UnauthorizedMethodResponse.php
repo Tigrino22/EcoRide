@@ -3,18 +3,15 @@
 namespace Tigrino\Http\Errors;
 
 use GuzzleHttp\Psr7\Response;
-use Psr\Container\ContainerInterface;
-use Tigrino\Core\Renderer\RendererInterface;
-use Tigrino\Core\Renderer\TwigRenderer;
 
 /**
  * Classe gestionnaire de l'affichage de l'erreur 403
  *
  */
-class ForbiddenResponse extends Response
+class UnauthorizedMethodResponse extends Response
 {
     public function __construct(
-        int $status = CodeError::FORBIDDEN,
+        int $status = CodeError::UNAUTHORIZEDMETHOD,
         array $headers = [],
         $body = null
     ) {
@@ -22,7 +19,7 @@ class ForbiddenResponse extends Response
         parent::__construct($status, $headers, $body);
     }
 
-    public static function create(string $body): ForbiddenResponse
+    public static function create(string $body): UnauthorizedMethodResponse
     {
         return new self(body: $body);
     }

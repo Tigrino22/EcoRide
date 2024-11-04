@@ -15,4 +15,10 @@ return [
         "error.404",
         []
     ],
+    ["GET",
+        "/unauthorized",
+        [ErrorController::class, "error405"],
+        "error.405",
+        []
+    ],
 ];

@@ -27,6 +27,7 @@ class TwigRenderer implements RendererInterface
         $this->twig->addExtension(new TwigAssetsExtension($assetPath, $env));
         $this->twig->addExtension(new TwigPathExtension($container));
         $this->twig->addExtension(new TwigSessionExtension());
+        $this->twig->addExtension($container->get(TwigFlashExtension::class));
     }
 
     /**

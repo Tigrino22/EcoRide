@@ -2,7 +2,7 @@
 
 {% block body %}
 
-    <h1 class="text-2xl md:text-3xl font-semibold text-center">Enregistrement d'un véhicule pour <span class="underline">{{ session('user').username }}</span></h1>
+    <h1 class="text-2xl md:text-3xl font-semibold text-center">Modification d'un véhicule pour <span class="underline">{{ session('user').username }}</span></h1>
 
     <div class="flex flex-col my-8 md:my-12">
         <form method="post">
@@ -13,6 +13,7 @@
                 </label>
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        value="{{ car.plateOfRegistration }}"
                         id="plate_of_registration" name="plate_of_registration" type="text">
             </div>
             <div class="flex flex-col gap-2 mb-4">
@@ -21,6 +22,7 @@
                 </label>
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        value="{{ car.firstRegistrationAt|date('Y-m-d') }}"
                         id="first_registration_at" name="first_registration_at" type="date">
             </div>
             <div class="flex flex-col gap-2 mb-4">
@@ -29,6 +31,7 @@
                 </label>
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        value="{{ car.brand }}"
                         id="brand" name="brand" type="text">
             </div>
             <div class="flex flex-col gap-2 mb-4">
@@ -37,6 +40,7 @@
                 </label>
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        value="{{ car.model }}"
                         id="model" name="model" type="text">
             </div>
             <div class="flex flex-col gap-2 mb-4">
@@ -45,6 +49,7 @@
                 </label>
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        value="{{ car.color }}"
                         id="color" name="color" type="text">
             </div>
             <div class="flex flex-col gap-2 mb-4">
@@ -53,6 +58,7 @@
                 </label>
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        value="{{ car.places }}"
                         id="places" name="places" type="number">
             </div>
             <div class="flex flex-col gap-2 mb-4">
@@ -61,7 +67,7 @@
                 </label>
                 <textarea
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                        id="preferences" name="preferences"></textarea>
+                        id="preferences" name="preferences">{{ car.preferences }}</textarea>
             </div>
 
 
@@ -72,7 +78,7 @@
                     bg-gradient-to-tl from-teal-300 to-cyan-600 text-white px-4 py-2
                     rounded-md shadow-md hover:bg-gradient-to-tl hover:from-teal-500 hover:to-cyan-800
                 ">
-                    Ajouter le véhicule
+                    Enregistrer les changements
                 </button>
             </div>
         </form>

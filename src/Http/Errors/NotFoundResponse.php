@@ -11,7 +11,7 @@ use GuzzleHttp\Psr7\Response;
 class NotFoundResponse extends Response
 {
     public function __construct(
-        int $status = 404,
+        int $status = CodeError::NOT_FOUND,
         array $headers = [],
         $body = null
     ) {

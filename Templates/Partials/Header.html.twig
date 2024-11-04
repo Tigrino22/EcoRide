@@ -72,13 +72,17 @@
                                 </kbd>
                             </div>
                             <!-- Dropdown menu -->
-                            <div id="js_dropdown_user_menu" class="absolute z-10 hidden translate-y-0 opacity-100 h-auto transition ease-in-out bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                            <div id="js_dropdown_user_menu" class="absolute hidden translate-y-0 opacity-100 h-auto transition ease-in-out bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                                 <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                     <div class="font-medium truncate">{{ session('user').email }}</div>
                                 </div>
                                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="avatarButton">
                                     <li>
                                         <a href="{{ path('profile') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Mon profil</a>
+                                    </li>
+                                    {# Lien à cacher si le USER n'est pas un chauffeur #}
+                                    <li>
+                                        <a href="{{ path('car.show') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Mes véhicules</a>
                                     </li>
                                     <li>
                                         <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>

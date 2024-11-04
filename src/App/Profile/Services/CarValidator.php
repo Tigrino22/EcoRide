@@ -25,17 +25,17 @@ class CarValidator
         if (empty($car['color'])) {
             $errors['color'] = 'La couleur est requise.';
         }
-        if (empty($car['plateOfRegistration'])) {
-            $errors['plateOfRegistration'] = 'La plaque d\'immatriculation est requise.';
+        if (empty($car['plate_of_registration'])) {
+            $errors['plate_of_registration'] = 'La plaque d\'immatriculation est requise.';
         }
-        if (empty($car['firstRegistrationAt'])) {
-            $errors['firstRegistrationAt'] = 'La date de première immatriculation est requise.';
+        if (empty($car['first_registration_at'])) {
+            $errors['first_registration_at'] = 'La date de première immatriculation est requise.';
         } else {
-            $date = \DateTime::createFromFormat('Y-m-d', $car['firstRegistrationAt']);
-            if ($date === false || $date->format('Y-m-d') !== $car['firstRegistrationAt']) {
-                $errors['firstRegistrationAt'] = 'La date de première immatriculation est invalide.';
+            $date = \DateTime::createFromFormat('Y-m-d', $car['first_registration_at']);
+            if ($date === false || $date->format('Y-m-d') !== $car['first_registration_at']) {
+                $errors['first_registration_at'] = 'La date de première immatriculation est invalide.';
             } else {
-                $car['firstRegistrationAt'] = $date->format('Y-m-d');
+                $car['first_registration_at'] = $date->format('Y-m-d');
             }
         }
 
@@ -48,6 +48,6 @@ class CarValidator
             return ['errors' => $errors];
         }
 
-        return ['data' => $car];
+        return $car;
     }
 }

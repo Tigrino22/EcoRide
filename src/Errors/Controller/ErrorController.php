@@ -32,4 +32,16 @@ class ErrorController extends AbstractController
 
         return NotFoundResponse::create($content);
     }
+
+    public function error405(): ResponseInterface
+    {
+        $title = 'Unauthorized Methode used';
+        $message = "La méthode que vous avez utilisée ne respecte pas notre code de la route.";
+
+        $params = compact('title', 'message');
+
+        $content = $this->render('@Errors/unauthorizedMethod', $params);
+
+        return NotFoundResponse::create($content);
+    }
 }

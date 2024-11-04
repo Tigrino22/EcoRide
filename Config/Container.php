@@ -1,10 +1,15 @@
 <?php
 
 
+use function DI\create;
 use function DI\env;
 use function DI\factory;
 use function DI\autowire;
+use function DI\get;
 
+use Tigrino\Core\Renderer\TwigFlashExtension;
+use Tigrino\Core\Session\SessionManager;
+use Tigrino\Services\FlashService;
 use Tigrino\App\Profile\Repository\UserEcorideRepository;
 use Tigrino\Services\SerializerService;
 use Tigrino\Core\Router\Router;
@@ -22,6 +27,11 @@ return [
     Router::class => autowire(Router::class),
     AuthController::class => autowire(AuthController::class),
     SerializerService::class => autowire(SerializerService::class),
+    SessionManager::class => create(SessionManager::class),
+    FlashService::class => autowire(FlashService::class)
+        ->constructor(get(SessionManager::class)),
+    TwigFlashExtension::class => autowire(TwigFlashExtension::class)
+        ->constructor(get(FlashService::class)),
 
     // Ecoride
     UserEcorideRepository::class => autowire(UserEcorideRepository::class)

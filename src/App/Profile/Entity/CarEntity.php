@@ -3,6 +3,7 @@
 namespace Tigrino\App\Profile\Entity;
 
 use AllowDynamicProperties;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 #[AllowDynamicProperties] class CarEntity
@@ -45,15 +46,15 @@ use Ramsey\Uuid\UuidInterface;
         return new self(
             $data['id'],
             $data['user_id'],
-            $data['plateOfRegistration'],
-            new \DateTime($data['firstRegistrationAt']),
+            $data['plate_of_registration'],
+            new \DateTime($data['first_registration_at']),
             $data['brand'],
             $data['model'],
             $data['color'],
             $data['places'],
             $data['preferences'],
-            new \DateTime($data['createdAt']),
-            new \DateTime($data['updatedAt'])
+            new \DateTime($data['created_at']),
+            new \DateTime($data['updated_at'])
         );
     }
 

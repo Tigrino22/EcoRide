@@ -28,7 +28,7 @@ class SerializerService
         return $array;
     }
 
-    function arrayToObject(array $data, string $className)
+    public function arrayToObject(array $data, string $className)
     {
         if (!class_exists($className)) {
             throw new InvalidArgumentException("La classe $className n'existe pas.");
