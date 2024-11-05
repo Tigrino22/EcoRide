@@ -6,7 +6,7 @@ use DI\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Tigrino\Core\Renderer\TwigPathExtension;
+use Tigrino\Core\Renderer\Extensions\TwigPathExtension;
 use Tigrino\Core\Router\Router;
 
 class TwigPathExtensionTest extends TestCase

@@ -2,7 +2,11 @@
 
 namespace Tigrino\Core\Renderer;
 
-use Tigrino\Core\Renderer\RendererInterface;
+use Tigrino\Core\Renderer\Extensions\TwigAssetsExtension;
+use Tigrino\Core\Renderer\Extensions\TwigCsrfExtension;
+use Tigrino\Core\Renderer\Extensions\TwigFlashExtension;
+use Tigrino\Core\Renderer\Extensions\TwigPathExtension;
+use Tigrino\Core\Renderer\Extensions\TwigSessionExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -25,9 +29,10 @@ class TwigRenderer implements RendererInterface
             $this->addGlobals('session', $_SESSION);
         }
         $this->twig->addExtension(new TwigAssetsExtension($assetPath, $env));
-        $this->twig->addExtension(new TwigPathExtension($container));
-        $this->twig->addExtension(new TwigSessionExtension());
+        $this->twig->addExtension($container->get(TwigPathExtension::class));
+        $this->twig->addExtension($container->get(TwigSessionExtension::class));
         $this->twig->addExtension($container->get(TwigFlashExtension::class));
+        $this->twig->addExtension($container->get(TwigCsrfExtension::class));
     }
 
     /**

@@ -6,6 +6,7 @@
 
     <div class="flex flex-col my-8 md:my-12">
         <form method="post">
+            {{ csrf_token('update_car')|raw }}
         {# Forumulaire insertion véhicule #}
             <div class="flex flex-col gap-2 mb-4">
                 <label for="plate_of_registration">

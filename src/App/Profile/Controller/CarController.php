@@ -136,7 +136,7 @@ class CarController extends AbstractController
                 return new Response(
                     400,
                     [],
-                    $this->render('@Profile/Car/update')
+                    $this->render('@Profile/Car/update', ['car' => $car])
                 );
             }
 
@@ -166,7 +166,6 @@ class CarController extends AbstractController
          * Affichage de la page en GET
          *
          */
-        $car = $this->repository->getCarById(Uuid::fromString($id));
 
         return new Response(
             200,

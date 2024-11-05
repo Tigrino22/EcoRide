@@ -61,17 +61,25 @@ class App
     /**
      * Fonction ajoutant des middlewares a l'application
      *
-     *  @param MiddlewareInterface[]|MiddlewareInterface|null
+     *  @param string|null
      */
     public function addMiddleware($middlewares = null): void
     {
         if ($middlewares) {
             if (is_array($middlewares)) {
                 foreach ($middlewares as $middleware) {
-                    $this->middlewares[] = $middleware;
+                    if (is_string($middleware)) {
+                        $this->middlewares[] = $this->container->get($middleware);
+                    } else {
+                        throw new \InvalidArgumentException("Expected string class name, got " . gettype($middleware));
+                    }
                 }
             } else {
-                $this->middlewares[] = $middlewares;
+                if (is_string($middlewares)) {
+                    $this->middlewares[] = $this->container->get($middlewares);
+                } else {
+                    throw new \InvalidArgumentException("Expected string class name, got " . gettype($middlewares));
+                }
             }
         }
     }
@@ -90,9 +98,9 @@ class App
     public function run(ServerRequestInterface $request): ResponseInterface
     {
         // Last middleware pour géré le routing
-        $this->addMiddleware(function ($request, $handler) {
+        $this->middlewares[] = function ($request, $handler) {
             return $this->container->get(Router::class)->dispatch($request);
-        });
+        };
 
         // Execution de la pile de middleware.
         $relay = new Relay($this->middlewares);

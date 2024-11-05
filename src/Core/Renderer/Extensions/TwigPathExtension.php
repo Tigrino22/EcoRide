@@ -1,12 +1,11 @@
 <?php
 
-namespace Tigrino\Core\Renderer;
+namespace Tigrino\Core\Renderer\Extensions;
 
 use DI\NotFoundException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Tigrino\Core\Misc\VarDumper;
 use Tigrino\Core\Router\Router;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

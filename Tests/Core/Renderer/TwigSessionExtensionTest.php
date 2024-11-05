@@ -3,7 +3,7 @@
 namespace Core\Renderer;
 
 use PHPUnit\Framework\TestCase;
-use Tigrino\Core\Renderer\TwigSessionExtension;
+use Tigrino\Core\Renderer\Extensions\TwigSessionExtension;
 
 class TwigSessionExtensionTest extends TestCase
 {

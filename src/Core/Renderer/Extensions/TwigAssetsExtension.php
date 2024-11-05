@@ -1,11 +1,9 @@
 <?php
 
-namespace Tigrino\Core\Renderer;
+namespace Tigrino\Core\Renderer\Extensions;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-
-use function DeepCopy\deep_copy;
 
 class TwigAssetsExtension extends AbstractExtension
 {

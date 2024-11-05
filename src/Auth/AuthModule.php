@@ -5,11 +5,9 @@ namespace Tigrino\Auth;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Tigrino\Auth\Middleware\AuthMiddleware;
 use Tigrino\Core\App;
 use Tigrino\Core\Modules\ModuleInterface;
 use Tigrino\Core\Renderer\RendererInterface;
-use Tigrino\Core\Router\RouterInterface;
 
 class AuthModule implements ModuleInterface
 {
@@ -17,12 +15,6 @@ class AuthModule implements ModuleInterface
      * @var App
      */
     private $app;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-    private ContainerInterface $container;
 
     /**
      * Méthode a implémenter en fonction du fonctionnement
@@ -41,12 +33,5 @@ class AuthModule implements ModuleInterface
         /** @var RendererInterface $renderer */
         $renderer = $container->get(RendererInterface::class);
         $renderer->addPath(dirname(__DIR__, 2) . '/Templates/Auth', 'Auth');
-
-        $this->addAuthMiddleware($container);
-    }
-
-    private function addAuthMiddleware($container): void
-    {
-        $this->app->addMiddleware(new AuthMiddleware($container));
     }
 }

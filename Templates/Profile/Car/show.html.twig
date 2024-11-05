@@ -31,6 +31,7 @@
                                    class="px-2 py-1 shadow-md rounded-md text-white bg-teal-400
                                 transition-colors duration-300 hover:bg-teal-700 ">Modifier</a>
                                 <form action="{{ path('car.delete', {'id' : car.id}) }}" method="POST" class="inline-block">
+                                    {{ csrf_token('delete_button_' ~ car.id)|raw }}
                                     <input type="hidden" name="_method" value="DELETE">
                                     <button type="submit" id="js_car_delete_{{ car.id }}"
                                         class="px-2 py-1 shadow-md rounded-md text-white bg-red-400

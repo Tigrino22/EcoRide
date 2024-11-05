@@ -50,7 +50,8 @@ $user = new UserEcoride([
     'email' => $email,
     'firstname' => $firstname,
     'name' => $name,
-    'password' => $password
+    'password' => $password,
+    'is_driver' => true
 ]);
 
 try {

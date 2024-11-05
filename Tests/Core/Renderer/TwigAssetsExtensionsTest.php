@@ -3,7 +3,7 @@
 namespace Core\Renderer;
 
 use PHPUnit\Framework\TestCase;
-use Tigrino\Core\Renderer\TwigAssetsExtension;
+use Tigrino\Core\Renderer\Extensions\TwigAssetsExtension;
 
 class TwigAssetsExtensionsTest extends TestCase
 {

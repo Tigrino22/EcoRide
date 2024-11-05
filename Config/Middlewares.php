@@ -5,9 +5,12 @@
  * Les middlewares sont ici à instancier.
  */
 
+use Tigrino\Auth\Middleware\AuthMiddleware;
+use Tigrino\Core\Middleware\CSRFMiddleware;
 use Tigrino\Core\Middleware\TrailingSlashMiddleware;
 
 return [
-    new TrailingSlashMiddleware(),
-    // new CORSMiddleware(),
+    TrailingSlashMiddleware::class,
+    CSRFMiddleware::class,
+    AuthMiddleware::class,
 ];

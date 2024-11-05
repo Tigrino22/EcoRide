@@ -14,6 +14,8 @@ class UserEcoride extends User
     private ?string $photo;
     private ?string $created_at;
     private ?string $updated_at;
+    private bool $is_driver;
+    private bool $is_passenger;
 
     public function __construct(array $data = [])
     {
@@ -31,6 +33,8 @@ class UserEcoride extends User
         $this->address = $data['address'] ?? null;
         $this->birthday = $data['birthday'] ?? null;
         $this->photo = $data['photo'] ?? null;
+        $this->is_passenger = $data['is_passenger'] ?? true;
+        $this->is_driver = $data['is_driver'] ?? false;
         $this->created_at = $data['created_at'] ?? null;
         $this->updated_at = $data['updated_at'] ?? null;
     }
@@ -118,5 +122,25 @@ class UserEcoride extends User
     public function setUpdatedAt($updated_at): void
     {
         $this->updated_at = $updated_at;
+    }
+
+    public function getIsDriver(): bool
+    {
+        return $this->is_driver;
+    }
+
+    public function setIsDriver(bool $is_driver): void
+    {
+        $this->is_driver = $is_driver;
+    }
+
+    public function getIsPassenger(): bool
+    {
+        return $this->is_passenger;
+    }
+
+    public function setIsPassenger(bool $is_passenger): void
+    {
+        $this->is_passenger = $is_passenger;
     }
 }

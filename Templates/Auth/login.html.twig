@@ -11,6 +11,7 @@
             </h1>
 
             <form class="max-w-md mx-auto w-full px-6 space-y-8 mt-8" action="{{ path('auth.login') }}" method="POST">
+                {{ csrf_token('login_form')|raw }}
                 <div class="relative z-0 w-full mb-5 group">
                     <input type="text" name="username" id="login_username" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-teal-500 focus:outline-none focus:ring-0 focus:border-teal-600 peer"
                         placeholder=" " required value="{% if user %}{{ user.username }}{% endif %}"/>

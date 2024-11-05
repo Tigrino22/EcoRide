@@ -1,6 +1,6 @@
 <?php
 
-namespace Tigrino\Core\Renderer;
+namespace Tigrino\Core\Renderer\Extensions;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

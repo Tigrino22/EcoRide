@@ -1,6 +1,6 @@
 <?php
 
-namespace Tigrino\Core\Renderer;
+namespace Tigrino\Core\Renderer\Extensions;
 
 use Tigrino\Services\FlashService;
 use Twig\Extension\AbstractExtension;

@@ -22,7 +22,7 @@ $app = new App(Config::getContainer(), include($modules));
 // Mise en place de Whoops pour l'affiche-age des erreur
 // en environnement de développement.
 if (getenv("APP_ENV") === "DEV") {
-    $app->addMiddleware(new WhoopsMiddleware());
+    $app->addMiddleware(WhoopsMiddleware::class);
 }
 
 $app->addMiddleware(include($middlewares));

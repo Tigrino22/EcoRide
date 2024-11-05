@@ -8,6 +8,7 @@ use Ramsey\Uuid\UuidInterface;
 use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Core\Database\Database;
+use Tigrino\Core\Errors\ErrorHandler;
 
 class UserRepository
 {
@@ -266,7 +267,9 @@ class UserRepository
 
             return $user;
         } catch (Exception $exception) {
-            echo "Erreur lors de l'insertion ou de l'update de l'user : {$exception->getMessage()}";
+            ErrorHandler::logMessage(
+                "Erreur lors de l'insertion ou de l'update de l'user : {$exception->getMessage()}"
+            );
 
             return false;
         }

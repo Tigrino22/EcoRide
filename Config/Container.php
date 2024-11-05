@@ -1,21 +1,21 @@
 <?php
 
 
+use Tigrino\App\Profile\Repository\UserEcorideRepository;
+use Tigrino\Auth\Controller\AuthController;
+use Tigrino\Core\Renderer\Extensions\TwigFlashExtension;
+use Tigrino\Core\Renderer\RendererInterface;
+use Tigrino\Core\Renderer\TwigRendererFactory;
+use Tigrino\Core\Router\Router;
+use Tigrino\Core\Session\SessionManager;
+use Tigrino\Core\Session\SessionManagerInterface;
+use Tigrino\Services\FlashService;
+use Tigrino\Services\SerializerService;
+use function DI\autowire;
 use function DI\create;
 use function DI\env;
 use function DI\factory;
-use function DI\autowire;
 use function DI\get;
-
-use Tigrino\Core\Renderer\TwigFlashExtension;
-use Tigrino\Core\Session\SessionManager;
-use Tigrino\Services\FlashService;
-use Tigrino\App\Profile\Repository\UserEcorideRepository;
-use Tigrino\Services\SerializerService;
-use Tigrino\Core\Router\Router;
-use Tigrino\Auth\Controller\AuthController;
-use Tigrino\Core\Renderer\RendererInterface;
-use Tigrino\Core\Renderer\TwigRendererFactory;
 
 return [
     'templates.path' => dirname(__DIR__) . '/Templates', // Pour le namespace __main__ twig
@@ -24,15 +24,9 @@ return [
     'modules' => include(__DIR__ . '/Modules.php'),
 
     RendererInterface::class => factory(TwigRendererFactory::class),
-    Router::class => autowire(Router::class),
-    AuthController::class => autowire(AuthController::class),
-    SerializerService::class => autowire(SerializerService::class),
-    SessionManager::class => create(SessionManager::class),
+    SessionManagerInterface::class => autowire(SessionManager::class),
     FlashService::class => autowire(FlashService::class)
         ->constructor(get(SessionManager::class)),
     TwigFlashExtension::class => autowire(TwigFlashExtension::class)
         ->constructor(get(FlashService::class)),
-
-    // Ecoride
-    UserEcorideRepository::class => autowire(UserEcorideRepository::class)
 ];

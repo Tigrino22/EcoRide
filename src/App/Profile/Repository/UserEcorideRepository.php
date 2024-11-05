@@ -7,6 +7,7 @@ use Tigrino\App\Profile\Entity\UserEcoride;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Database\Database;
+use Tigrino\Core\Misc\VarDumper;
 
 class UserEcorideRepository extends UserRepository
 {
@@ -29,6 +30,8 @@ class UserEcorideRepository extends UserRepository
              address, 
              birthday, 
              photo, 
+             is_passenger,
+             is_driver,
              created_at, 
              updated_at) 
             VALUES (:id, 
@@ -40,7 +43,9 @@ class UserEcorideRepository extends UserRepository
                     :telephone, 
                     :address, 
                     :birthday, 
-                    :photo, 
+                    :photo,
+                    :is_passenger,
+                    :is_driver,
                     :created_at, 
                     :updated_at)';
 
@@ -55,6 +60,8 @@ class UserEcorideRepository extends UserRepository
             ':address' => $user->getAddress(),
             ':birthday' => $user->getBirthday(),
             ':photo' => $user->getPhoto(), // Attention au format de l'insertion ici
+            ':is_passenger' => $user->getIsPassenger(),
+            ':is_driver' => $user->getIsDriver(),
             ':created_at' => $user->getCreatedAt() ?: date('Y-m-d H:i:s'),
             ':updated_at' => $user->getUpdatedAt() ?: date('Y-m-d H:i:s')
         ];
@@ -75,20 +82,24 @@ class UserEcorideRepository extends UserRepository
             address = :address,
             birthday = :birthday,
             photo = :photo,
+            is_passenger = :is_passenger,
+            is_driver = :is_driver,
             updated_at = :updated_at
             WHERE id = :id';
 
         $params = [
-            ':id' => $user->getId()->getBytes(), // UUID en format binaire si nécessaire
+            ':id' => $user->getId()->getBytes(),
             ':username' => $user->getUsername(),
             ':name' => $user->getName(),
             ':firstname' => $user->getFirstname(),
             ':email' => $user->getEmail(),
-            ':password' => $user->getPassword(), // Assurez-vous que le mot de passe est déjà haché
+            ':password' => $user->getPassword(),
             ':telephone' => $user->getTelephone(),
             ':address' => $user->getAddress(),
             ':birthday' => $user->getBirthday(),
-            ':photo' => $user->getPhoto(), // Veillez à bien gérer le format du BLOB pour la photo
+            ':photo' => $user->getPhoto(), // gérer le format du BLOB pour la photo
+            ':is_passenger' => $user->getIsPassenger(),
+            ':is_driver' => $user->getIsDriver(),
             ':updated_at' => date('Y-m-d H:i:s') // Met à jour avec la date et l'heure actuelles
         ];
 
@@ -107,17 +118,6 @@ class UserEcorideRepository extends UserRepository
         $user = new UserEcoride($data);
 
         $user->setId(Uuid::fromBytes($data['id']));
-        $user->setUsername($data['username']);
-        $user->setName($data['name']);
-        $user->setFirstname($data['firstname']);
-        $user->setEmail($data['email']);
-        $user->setPassword($data['password']);
-        $user->setTelephone($data['telephone']);
-        $user->setAddress($data['address']);
-        $user->setBirthday($data['birthday']);
-        $user->setPhoto($data['photo']);
-        $user->setCreatedAt($data['created_at']);
-        $user->setUpdatedAt($data['updated_at']);
         $user->setRoles($this->getRoles($user));
 
         return $user;
