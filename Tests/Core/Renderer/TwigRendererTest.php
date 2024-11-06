@@ -2,10 +2,15 @@
 
 namespace Core\Renderer;
 
+use DI\ContainerBuilder;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Tigrino\Core\Renderer\TwigRenderer;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
+use Tigrino\Core\Session\SessionManager;
+use Tigrino\Core\Session\SessionManagerInterface;
+use Tigrino\Services\CSRFService;
+
+use function DI\autowire;
 
 class TwigRendererTest extends TestCase
 {
@@ -13,14 +18,18 @@ class TwigRendererTest extends TestCase
     private ?string $templatePath = null;
     private ?string $assetPath = null;
     private string $env = 'development';
-    private $container;
+    private ContainerInterface $container;
 
     protected function setUp(): void
     {
         $this->templatePath = dirname(__DIR__, 2) . '/Templates';
         $this->assetPath = dirname(__DIR__, 2) . '/Templates/assets';
 
-        $this->container = $this->createMock(\DI\Container::class);
+        $builder = new ContainerBuilder();
+        $builder->addDefinitions([
+            SessionManagerInterface::class => autowire(SessionManager::class),
+        ]);
+        $this->container = $builder->build();
 
         $this->twigRenderer = new TwigRenderer($this->templatePath, $this->assetPath, $this->env, $this->container);
     }

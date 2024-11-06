@@ -1,8 +1,10 @@
 <?php
 
+use Tests\Core\Middleware\FakeMiddleware;
 use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Renderer\TwigRendererFactory;
 
+use function DI\autowire;
 use function DI\factory;
 
 return [
@@ -10,4 +12,6 @@ return [
     'asset.path' => dirname(__DIR__) . '/Public/assets', // Chemin de chargement des assets en prod
     'environnement' => 'DEV',
     RendererInterface::class => factory(TwigRendererFactory::class),
+    FakeMiddleware::class => autowire(FakeMiddleware::class),
+
 ];

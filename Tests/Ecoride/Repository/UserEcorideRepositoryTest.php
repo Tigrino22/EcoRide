@@ -33,6 +33,8 @@ class UserEcorideRepositoryTest extends TestCase
             address TEXT,
             birthday TEXT,
             photo BLOB,
+            is_passenger BOOL,
+            is_driver BOOL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP
         )");

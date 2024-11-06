@@ -17,7 +17,7 @@ class TrailingslashMiddlewareTest extends TestCase
         $container = $builder->build();
         $app = new App($container);
 
-        $app->addMiddleware(new TrailingSlashMiddleware());
+        $app->addMiddleware(TrailingSlashMiddleware::class);
 
         $request = new ServerRequest('GET', '/test/');
         $response = $app->run($request);

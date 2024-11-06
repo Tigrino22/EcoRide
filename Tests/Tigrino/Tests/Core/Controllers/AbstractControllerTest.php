@@ -7,6 +7,10 @@ use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Tests\Core\Controllers\TestController;
+use Tests\Core\Renderer\FakeRenderer;
+use Tigrino\Core\Renderer\RendererInterface;
+
+use function DI\autowire;
 
 class AbstractControllerTest extends TestCase
 {
@@ -15,7 +19,9 @@ class AbstractControllerTest extends TestCase
     public function setUp(): void
     {
         $containerBuilder = new ContainerBuilder();
-        $containerBuilder->addDefinitions(dirname(__DIR__, 2) . '/Config/Container.php');
+        $containerBuilder->addDefinitions([
+            RendererInterface::class => autowire(FakeRenderer::class)
+        ]);
         $this->container = $containerBuilder->build();
     }
     public function testExecuteMethodExists()

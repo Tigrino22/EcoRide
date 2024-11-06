@@ -8,15 +8,21 @@ use Dotenv\Dotenv;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
+use Tests\Core\Renderer\FakeRenderer;
 use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Repository\UserRepository;
 use Tigrino\Core\Database\Database;
+use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Router\Router;
 use Tests\Core\Controllers\TestController;
 use Tigrino\Auth\AuthModule;
 use Tigrino\Auth\Middleware\AuthMiddleware;
 use Tigrino\Core\App;
+use Tigrino\Core\Session\SessionManager;
+use Tigrino\Core\Session\SessionManagerInterface;
 use Tigrino\Http\Response\JsonResponse;
+
+use function DI\autowire;
 
 class RouterTest extends TestCase
 {
@@ -27,7 +33,10 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $containerBuilder = new ContainerBuilder();
-        $containerBuilder->addDefinitions(dirname(__DIR__, 2) . '/Config/Container.php');
+        $containerBuilder->addDefinitions([
+            SessionManagerInterface::class => autowire(SessionManager::class),
+            RendererInterface::class => autowire(FakeRenderer::class)
+        ]);
         $this->container = $containerBuilder->build();
 
         $this->router = new Router($this->container);

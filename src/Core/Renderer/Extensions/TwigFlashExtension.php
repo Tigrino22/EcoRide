@@ -8,7 +8,6 @@ use Twig\TwigFunction;
 
 class TwigFlashExtension extends AbstractExtension
 {
-
     private FlashService $flashService;
 
     public function __construct(FlashService $flashService)
