@@ -65,5 +65,5 @@ return [
         "/logout",
         [AuthController::class, "logout"],
         "auth.logout",
-        [Role::GUEST]],
+        [Role::USER, Role::ADMIN]],
 ];
