@@ -30,10 +30,10 @@ class ProfileController extends AbstractController
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->session = $this->container->get(SessionManager::class);
-        $this->repository = $this->container->get(UserEcorideRepository::class);
-        $this->serializer = $this->container->get(SerializerService::class);
-        $this->flashService = $this->container->get(FlashService::class);
+        $this->session = $container->get(SessionManager::class);
+        $this->repository = $container->get(UserEcorideRepository::class);
+        $this->serializer = $container->get(SerializerService::class);
+        $this->flashService = $container->get(FlashService::class);
     }
 
     /**
@@ -64,6 +64,8 @@ class ProfileController extends AbstractController
     }
 
     /**
+     * Fonction de mise à jour d'un profile utilisateur
+     *
      * @param $id
      * @return ResponseInterface
      * @throws ContainerExceptionInterface
@@ -119,6 +121,12 @@ class ProfileController extends AbstractController
         }
     }
 
+    /**
+     * Fonction a implémenter qui servira à mettre à jour le status utilisateur via requete fetch
+     * en appuyant sur le toggle button.
+     * @param $id
+     * @return ResponseInterface
+     */
     public function updateDriver($id): ResponseInterface
     {
         if ($this->request->getMethod() !== 'POST') {

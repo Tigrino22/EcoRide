@@ -35,11 +35,13 @@ class CarController extends AbstractController
     {
         parent::__construct($container);
         /** @var CarRepository repository */
-        $this->repository = $this->container->get(CarRepository::class);
+        $this->repository = $container->get(CarRepository::class);
         /** @var SessionManager session */
-        $this->session = $this->container->get(SessionManager::class);
+        $this->session = $container->get(SessionManager::class);
         /** @var FlashService flashService */
-        $this->flashService = $this->container->get(FlashService::class);
+        $this->flashService = $container->get(FlashService::class);
+        /** @var Router router */
+        $this->router = $container->get(Router::class);
     }
 
     /**
@@ -98,7 +100,7 @@ class CarController extends AbstractController
             }
             $this->flashService->add('success', 'Le véhicule a correctement été ajouté.');
             return RedirectResponse::create(
-                $this->container->get(Router::class)->generate('car.show')
+                $this->router->generate('car.show')
             );
         }
 
@@ -149,7 +151,7 @@ class CarController extends AbstractController
             if ($this->repository->updateCar($carUpdated)) {
                 $this->flashService->add('success', 'Le véhicule a correctement été mis à jour.');
                 return RedirectResponse::create(
-                    $this->container->get(Router::class)->generate('car.show')
+                    $this->router->generate('car.show')
                 );
             } else {
                 $this->flashService->add('error', 'Une erreur est survenue durant la mise à jour.');
@@ -189,18 +191,18 @@ class CarController extends AbstractController
             if ($deleted) {
                 $this->flashService->add('success', 'Le véhicule a été supprimé avec succès.');
                 return RedirectResponse::create(
-                    $this->container->get(Router::class)->generate('car.show')
+                    $this->router->generate('car.show')
                 );
             } else {
                 $this->flashService->add('error', 'Erreur lors de la suppression du véhicule.');
                 return RedirectResponse::create(
-                    $this->container->get(Router::class)->generate('car.show')
+                    $this->router->generate('car.show')
                 );
             }
         }
 
         return RedirectResponse::create(
-            $this->container->get(Router::class)->generate('error.405')
+            $this->router->generate('error.405')
         );
     }
 
