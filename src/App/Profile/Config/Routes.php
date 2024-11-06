@@ -6,12 +6,26 @@ use Tigrino\App\Profile\Controller\ProfileController;
 use Tigrino\Auth\Config\Role;
 
 return [
+    // PROFIL
     [ 'GET',
         '/profile',
         [ProfileController::class, 'index'],
         'profile',
         [Role::USER, Role::ADMIN]],
 
+    [ 'POST',
+        '/profile/update/[*:id]',
+        [ProfileController::class, 'update'],
+        'profile.update',
+        [Role::USER, Role::ADMIN]],
+
+    [ 'POST',
+        '/profile/updateDriver/[*:id]',
+        [ProfileController::class, 'updateDriver'],
+        'profile.update.driver',
+        [Role::USER, Role::ADMIN]],
+
+    // VOITURE
     [ 'GET',
         '/car',
         [CarController::class, 'show'],
