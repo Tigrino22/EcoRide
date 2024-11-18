@@ -1,16 +1,15 @@
 <?php
 
-namespace Tests\Ecoride;
+namespace Admin;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Tigrino\App\Admin\AdminModule;
 use Tigrino\Core\App;
-use Tigrino\Core\Modules\ModuleInterface;
 use Tigrino\Core\Renderer\RendererInterface;
-use Tigrino\App\Ecoride\EcorideModule;
 use Tigrino\Core\Router\RouterInterface;
 
-class EcorideModuleTest extends TestCase
+class AdminModuleTest extends TestCase
 {
     private App $app;
     private ContainerInterface $container;
@@ -35,7 +34,7 @@ class EcorideModuleTest extends TestCase
         $this->router
             ->expects($this->once())
             ->method('addRoutes')
-            ->with($this->equalTo(include __DIR__ . '/../../src/App/Ecoride/Config/Routes.php'));
+            ->with($this->equalTo(include __DIR__ . '/../../../src/App/Admin/Config/Routes.php'));
 
         // Mock pour vérifier que les chemins des templates sont ajoutés
         $this->container
@@ -45,6 +44,6 @@ class EcorideModuleTest extends TestCase
             ->willReturn($this->renderer);
 
         // Instanciation du module
-        new EcorideModule($this->app, $this->container);
+        new AdminModule($this->app, $this->container);
     }
 }

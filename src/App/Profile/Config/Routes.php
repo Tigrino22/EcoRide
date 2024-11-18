@@ -50,6 +50,21 @@ return [
         'car.delete',
         [Role::USER, Role::ADMIN]],
 
+    // API
+
+    ['POST',
+        '/profile/toggle-driver/[*:id]',
+        [ProfileController::class, 'updateDriver'],
+        'toggle_driver',
+        []],
+
+    ['POST',
+        '/profile/toggle-passenger/[*:id]',
+        [ProfileController::class, 'updatePassenger'],
+        'toggle_passenger',
+        []],
+
+
     // AUTHENTIFICATION
     ["GET|POST",
         "/register",

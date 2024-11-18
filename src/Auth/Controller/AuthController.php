@@ -12,6 +12,7 @@ use Tigrino\Core\Router\Router;
 use Tigrino\Core\Session\SessionManager;
 use Tigrino\Http\Response\JsonResponse;
 use Tigrino\Http\Response\RedirectResponse;
+use Tigrino\Services\CookieManager;
 
 class AuthController extends AbstractController
 {
@@ -94,6 +95,7 @@ class AuthController extends AbstractController
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail()
             ]);
+            CookieManager::set('user_id', $user->getId(), 3600 * 24 * 7 * 360, false, false);
 
             return new Response(
                 status: 200,
@@ -115,6 +117,7 @@ class AuthController extends AbstractController
     public function logout(): ResponseInterface
     {
         $this->sessionManager->remove('user');
+        CookieManager::delete('user_id');
 
         return RedirectResponse::create(
             $this->container->get(Router::class)->generate('home')

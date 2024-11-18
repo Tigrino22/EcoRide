@@ -1,15 +1,15 @@
 <?php
 
-namespace Admin;
+namespace Profile;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Tigrino\App\Admin\AdminModule;
+use Tigrino\App\Profile\ProfileModule;
 use Tigrino\Core\App;
 use Tigrino\Core\Renderer\RendererInterface;
 use Tigrino\Core\Router\RouterInterface;
 
-class AdminModuleTest extends TestCase
+class ProfileModuleTest extends TestCase
 {
     private App $app;
     private ContainerInterface $container;
@@ -34,7 +34,7 @@ class AdminModuleTest extends TestCase
         $this->router
             ->expects($this->once())
             ->method('addRoutes')
-            ->with($this->equalTo(include __DIR__ . '/../../src/App/Admin/Config/Routes.php'));
+            ->with($this->equalTo(include __DIR__ . '/../../../src/App/Profile/Config/Routes.php'));
 
         // Mock pour vérifier que les chemins des templates sont ajoutés
         $this->container
@@ -44,6 +44,6 @@ class AdminModuleTest extends TestCase
             ->willReturn($this->renderer);
 
         // Instanciation du module
-        new AdminModule($this->app, $this->container);
+        new ProfileModule($this->app, $this->container);
     }
 }

@@ -25,13 +25,19 @@
                         id="first_registration_at" name="first_registration_at" type="date">
             </div>
             <div class="flex flex-col gap-2 mb-4">
-                <label for="brand">
-                    Marque :
-                </label>
-                <input
+                <label for="brand">Marque :</label>
+                <select
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                        id="brand" name="brand" type="text">
+                        id="brand" name="brand_id">
+                    <option value="" disabled selected>Choisissez une marque</option>
+                    {% for brand in brands %}
+                    <option value="{{ brand.id }}">
+                        {{ brand.name }}
+                    </option>
+                    {%  endfor %}
+                </select>
             </div>
+
             <div class="flex flex-col gap-2 mb-4">
                 <label for="model">
                     Modèle :
@@ -55,6 +61,20 @@
                 <input
                         class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                         id="places" name="places" type="number">
+            </div>
+
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="energie">Énergie :</label>
+                <select
+                        class="rounded-md shadow-md border-2 border-teal-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        id="energie" name="energie_id">
+                    <option value="" disabled selected>Choisissez une énergie</option>
+                    {% for energie in energies %}
+                    <option value="{{ energie.id }}">
+                        {{ energie.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="flex flex-col gap-2 mb-4">
                 <label for="preferences">

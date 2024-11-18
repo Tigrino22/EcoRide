@@ -31,15 +31,22 @@ class UserValidator
             }
         }
 
-        if (!empty($data['telephone']) && !preg_match('/^[0-9\s\-\+\(\)]+$/', $data['telephone'])) {
-            $errors['telephone'] = 'Le numéro de téléphone est invalide.';
+        if (!empty($data['phone']) && !preg_match('/^[0-9\s\-\+\(\)]+$/', $data['phone'])) {
+            $errors['phone'] = 'Le numéro de téléphone est invalide.';
+        }
+
+        if (!empty($data['postal_code']) && !is_numeric($data['postal_code'])) {
+            $errors['postal_code'] = 'Le code postal est invalide.';
+        }
+
+        if (empty($data['city'])) {
+            $errors['city'] = 'La ville est requise.';
         }
 
         $data['is_driver'] =
             isset($data['is_driver']) ? filter_var($data['is_driver'], FILTER_VALIDATE_BOOLEAN) : false;
         $data['is_passenger'] =
             isset($data['is_passenger']) ? filter_var($data['is_passenger'], FILTER_VALIDATE_BOOLEAN) : true;
-
 
         return !empty($errors) ? ['errors' => $errors] : $data;
     }

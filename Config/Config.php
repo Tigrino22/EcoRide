@@ -27,8 +27,7 @@ class Config
         $dotenv->load();
 
         // Enregistrement du ErrorHandler pour la capture des erreurs
-        $errorHandler = new ErrorHandler();
-        $errorHandler->register();
+        ErrorHandler::init(dirname(__DIR__));
 
         self::setContainer();
     }

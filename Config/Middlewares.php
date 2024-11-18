@@ -6,11 +6,13 @@
  */
 
 use Tigrino\Auth\Middleware\AuthMiddleware;
+use Tigrino\Core\Middleware\CORSMiddleware;
 use Tigrino\Core\Middleware\CSRFMiddleware;
 use Tigrino\Core\Middleware\TrailingSlashMiddleware;
 
 return [
     TrailingSlashMiddleware::class,
-    CSRFMiddleware::class,
+    //CORSMiddleware::class,
+    //CSRFMiddleware::class,
     AuthMiddleware::class,
 ];

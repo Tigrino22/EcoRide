@@ -30,16 +30,16 @@ class CovoiturageController extends AbstractController
         // Preparation de le vue
         // Retour de la vue avec les covoiturage récupérés.
 
-//        $covoiturages = null;
-//
-//        $params = compact('covoiturages');
-//
-//        $content = $this->render('@Covoiturage/covoiturage');
-//
-//        return new Response(
-//            200,
-//            [],
-//            $content
-//        );
+        $covoiturages = null;
+
+        $params = compact('covoiturages', 'search');
+
+        $content = $this->render('@Covoiturage/covoiturage', $params);
+
+        return new Response(
+            200,
+            [],
+            $content
+        );
     }
 }

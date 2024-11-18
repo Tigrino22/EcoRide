@@ -9,6 +9,7 @@ use Tigrino\Auth\Config\Role;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Core\Database\Database;
 use Tigrino\Core\Errors\ErrorHandler;
+use Tigrino\Core\Misc\VarDumper;
 
 class UserRepository
 {

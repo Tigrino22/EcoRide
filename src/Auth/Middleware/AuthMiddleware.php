@@ -10,6 +10,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Tigrino\Auth\Entity\GuestUser;
 use Tigrino\Auth\Entity\User;
 use Tigrino\Auth\Repository\UserRepository;
+use Tigrino\Core\Misc\VarDumper;
 use Tigrino\Core\Router\Router;
 use Tigrino\Core\Session\SessionManager;
 use Tigrino\Core\Session\SessionManagerInterface;

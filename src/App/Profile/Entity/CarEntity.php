@@ -6,72 +6,90 @@ use AllowDynamicProperties;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-#[AllowDynamicProperties] class CarEntity
+#[AllowDynamicProperties]
+class CarEntity
 {
+    private UuidInterface $id;
+    private UuidInterface $user_id;
+    private string $plateOfRegistration;
+    private \DateTime $firstRegistrationAt;
+    private string $brand_name;
+    private UuidInterface $brand_id;
+    private string $model;
+    private string $color;
+    private int $places;
+    private string $preferences;
+    private \DateTime $createdAt;
+    private \DateTime $updatedAt;
+    private string $energie_name;
+    private UuidInterface $energie_id;
+
     public function __construct(
         UuidInterface $id,
         UuidInterface $user_id,
         string $plateOfRegistration,
         \DateTime $firstRegistrationAt,
-        string $brand,
+        string $brand_name,
+        UuidInterface $brand_id,
         string $model,
         string $color,
         int $places,
         string $preferences,
         \DateTime $createdAt,
-        \DateTime $updatedAt
+        \DateTime $updatedAt,
+        string $energie_name,
+        UuidInterface $energie_id
     ) {
         $this->id = $id;
         $this->user_id = $user_id;
         $this->plateOfRegistration = $plateOfRegistration;
         $this->firstRegistrationAt = $firstRegistrationAt;
-        $this->brand = $brand;
+        $this->brand_name = $brand_name;
+        $this->brand_id = $brand_id;
         $this->model = $model;
         $this->color = $color;
         $this->places = $places;
         $this->preferences = $preferences;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
+        $this->energie_name = $energie_name;
+        $this->energie_id = $energie_id;
     }
 
-    /**
-     * Instancie un objet Car depuis un tableau passé en paramètres
-     *
-     * @param array $data
-     * @return self
-     * @throws \Exception
-     */
     public static function fromArray(array $data): self
     {
         return new self(
-            $data['id'],
-            $data['user_id'],
+            $data['id'] instanceof UuidInterface ? $data['id'] : Uuid::fromString($data['id']),
+            $data['user_id'] instanceof UuidInterface ? $data['user_id'] : Uuid::fromString($data['user_id']),
             $data['plate_of_registration'],
             new \DateTime($data['first_registration_at']),
-            $data['brand'],
+            $data['brand_name'],
+            $data['brand_id'],
             $data['model'],
             $data['color'],
-            $data['places'],
-            $data['preferences'],
+            (int)$data['places'],
+            $data['preferences'] ?? '',
             new \DateTime($data['created_at']),
-            new \DateTime($data['updated_at'])
+            new \DateTime($data['updated_at']),
+            $data['energie_name'],
+            $data['energie_id']
         );
     }
 
     /**
      * @return string
      */
-    public function getBrand(): string
+    public function getBrandName(): string
     {
-        return $this->brand;
+        return $this->brand_name;
     }
 
     /**
      * @param string $brand
      */
-    public function setBrand(string $brand): void
+    public function setBrandName(string $brand): void
     {
-        $this->brand = $brand;
+        $this->brand_name = $brand;
     }
 
     /**
@@ -232,5 +250,35 @@ use Ramsey\Uuid\UuidInterface;
     public function setId(UuidInterface $id): void
     {
         $this->uuid = $id;
+    }
+
+    public function getEnergieName(): string
+    {
+        return $this->energie_name;
+    }
+
+    public function setEnergieName(string $energie): void
+    {
+        $this->energie_name = $energie;
+    }
+
+    public function getBrandId(): UuidInterface
+    {
+        return $this->brand_id;
+    }
+
+    public function setBrandId(UuidInterface $brand_id): void
+    {
+        $this->brand_id = $brand_id;
+    }
+
+    public function getEnergieId(): UuidInterface
+    {
+        return $this->energie_id;
+    }
+
+    public function setEnergieId(UuidInterface $energie_id): void
+    {
+        $this->energie_id = $energie_id;
     }
 }

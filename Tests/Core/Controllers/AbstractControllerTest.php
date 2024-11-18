@@ -1,15 +1,14 @@
 <?php
 
-namespace Tigrino\Tests\Core\Controllers;
+namespace Core\Controllers;
 
 use DI\ContainerBuilder;
-use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Tests\Core\Controllers\TestController;
 use Tests\Core\Renderer\FakeRenderer;
 use Tigrino\Core\Renderer\RendererInterface;
-
 use function DI\autowire;
 
 class AbstractControllerTest extends TestCase

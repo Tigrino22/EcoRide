@@ -16,11 +16,9 @@ use Tigrino\App\Profile\Repository\CarRepository;
 use Tigrino\App\Profile\Services\CarValidator;
 use Tigrino\Core\Controller\AbstractController;
 use Tigrino\Core\Errors\ErrorHandler;
-use Tigrino\Core\Misc\VarDumper;
 use Tigrino\Core\Router\Router;
 use Tigrino\Core\Session\SessionManager;
 use Tigrino\Http\Errors\ForbiddenResponse;
-use Tigrino\Http\Errors\UnauthorizedMethodResponse;
 use Tigrino\Http\Response\RedirectResponse;
 use Tigrino\Services\FlashService;
 
@@ -59,14 +57,19 @@ class CarController extends AbstractController
     }
 
     /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return ResponseInterface
      */
     public function insert(): ResponseInterface
     {
         if ($this->request->getMethod() === 'POST') {
             $data = $this->request->getParsedBody();
+
             $data = CarValidator::validate($data);
+            if (CarValidator::plateAlreadyExists($data['plate_of_registration'])) {
+                $this->flashService->add('error', 'La plaque d\'immatriculation existe déjà.');
+
+                return RedirectResponse::create(path: $this->router->generate('car.insert'), status: 400);
+            }
 
             if (isset($data['errors'])) {
                 foreach ($data['errors'] as $error) {
@@ -74,17 +77,14 @@ class CarController extends AbstractController
                 }
 
                 // Render si des errors sont présentes
-                return new Response(
-                    400,
-                    [],
-                    $this->render('@Profile/Car/insert')
-                );
+                return RedirectResponse::create(path: $this->router->generate('car.insert'), status: 400);
             }
 
             $data['id'] = Uuid::uuid4();
             $data['user_id'] = $this->session->get('user')['id'];
             $data['created_at'] = date('Y-m-d H:i:s');
             $data['updated_at'] = date('Y-m-d H:i:s');
+            $data = $this->getBrandAndEnergie($data);
 
             try {
                 $car = CarEntity::fromArray($data);
@@ -92,11 +92,10 @@ class CarController extends AbstractController
             } catch (Exception $e) {
                 ErrorHandler::logMessage("Erreur lors de l'insertion du véhicule : " . $e->getMessage(), "ERROR");
 
-                return new Response(
-                    500,
-                    [],
-                    "Une erreur est survenue lors de l'insertion du véhicule."
-                );
+                $this->flashService->add('error', "Une erreur est survenue lors de l'insertion du véhicule.");
+
+                // Render si des errors sont présentes
+                return RedirectResponse::create(path: $this->router->generate('car.insert'), status: 400);
             }
             $this->flashService->add('success', 'Le véhicule a correctement été ajouté.');
             return RedirectResponse::create(
@@ -104,10 +103,15 @@ class CarController extends AbstractController
             );
         }
 
+        $brands = $this->repository->getBrands();
+        $energies = $this->repository->getEnergies();
+
+        $params = compact('brands', 'energies');
+
         return new Response(
             200,
             [],
-            $this->render('@Profile/Car/insert')
+            $this->render('@Profile/Car/insert', $params)
         );
     }
 
@@ -130,6 +134,15 @@ class CarController extends AbstractController
             $data = $this->request->getParsedBody();
             $data = CarValidator::validate($data);
 
+            if ($data['plate_of_registration'] !== $car->getPlateOfRegistration()) {
+                if (CarValidator::plateAlreadyExists($data['plate_of_registration'])) {
+                    $this->errorAndRedirect(
+                        'La plaque d\'immatriculation a été changé pour une déjà existante.',
+                        '@Profile/Car/update'
+                    );
+                }
+            }
+
             if (isset($data['errors'])) {
                 foreach ($data['errors'] as $error) {
                     $this->flashService->add('error', $error);
@@ -146,6 +159,7 @@ class CarController extends AbstractController
             $data['user_id'] = $this->session->get('user')['id'];
             $data['updated_at'] = date('Y-m-d H:i:s');
             $data['created_at'] = $car->getCreatedAt()->format('Y-m-d H:i:s');
+            $data = $this->getBrandAndEnergie($data);
             $carUpdated = CarEntity::fromArray($data);
 
             if ($this->repository->updateCar($carUpdated)) {
@@ -154,12 +168,9 @@ class CarController extends AbstractController
                     $this->router->generate('car.show')
                 );
             } else {
-                $this->flashService->add('error', 'Une erreur est survenue durant la mise à jour.');
-
-                return new Response(
-                    400,
-                    [],
-                    $this->render('@Profile/Car/update')
+                $this->errorAndRedirect(
+                    'Une erreur est survenue durant la mise à jour.',
+                    '@Profile/Car/update'
                 );
             }
         }
@@ -169,18 +180,24 @@ class CarController extends AbstractController
          *
          */
 
+
+        $brands = $this->repository->getBrands();
+        $energies = $this->repository->getEnergies();
+
         return new Response(
             200,
             [],
-            $this->render('@Profile/Car/update', ['car' => $car])
+            $this->render('@Profile/Car/update', [
+                'car' => $car,
+                'brands' => $brands,
+                'energies' => $energies
+            ])
         );
     }
 
     /**
      * @param $id
      * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function delete($id): ResponseInterface
     {
@@ -206,7 +223,7 @@ class CarController extends AbstractController
         );
     }
 
-    private function checkUser(UuidInterface $car_id)
+    private function checkUser(UuidInterface $car_id): void
     {
         /**
          * Si l'utilisateur n'a pas accès a ce véhicule.
@@ -214,9 +231,29 @@ class CarController extends AbstractController
          *
          */
         if ($car_id->toString() !== $this->session->get('user')['id']->toString()) {
-            return ForbiddenResponse::create(
+            ForbiddenResponse::create(
                 $this->render('@Errors/forbidden')
             );
         }
+    }
+
+    private function getBrandAndEnergie(array $data): array
+    {
+        $data['brand_id'] = Uuid::fromString($data['brand_id']);
+        $data['brand_name'] = $this->repository->getBrandById($data['brand_id'])[0]['name'];
+        $data['energie_id'] = Uuid::fromString($data['energie_id']);
+        $data['energie_name'] = $this->repository->getEnergieById($data['energie_id'])[0]['name'];
+        return $data;
+    }
+
+    private function errorAndRedirect(string $message, string $view): ResponseInterface
+    {
+        $this->flashService->add('error', $message);
+
+        return new Response(
+            400,
+            [],
+            $this->render($view)
+        );
     }
 }

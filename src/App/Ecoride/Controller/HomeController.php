@@ -13,9 +13,6 @@ class HomeController extends AbstractController
     {
         $content = $this->render('@Home/home');
 
-//        var_dump($this->container->get(SessionManager::class)->get('user'));
-//        die();
-
         return new Response(
             200,
             [],

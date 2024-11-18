@@ -8,16 +8,17 @@ use Psr\Http\Message\ResponseInterface;
 use Tigrino\App\Profile\Entity\UserEcoride;
 use Tigrino\App\Profile\Repository\UserEcorideRepository;
 use Tigrino\Auth\Controller\AuthController as AuthControllerFramwork;
-use Tigrino\Core\Misc\VarDumper;
 use Tigrino\Core\Router\Router;
 use Tigrino\Http\Response\JsonResponse;
 use Tigrino\Http\Response\RedirectResponse;
+use Tigrino\Services\CookieManager;
 use Tigrino\Services\FlashService;
 use Tigrino\Services\PasswordService;
+use Tigrino\Services\SerializerService;
 
 /**
  * Classe d'authentification du projet EcoRide
- * Elle étant directement du AuthControleur du framawork
+ * Elle étend directement du AuthControleur du framawork
  *
  */
 class AuthController extends AuthControllerFramwork
@@ -109,6 +110,7 @@ class AuthController extends AuthControllerFramwork
             }
 
             $user = $this->repository->findByUsername($data['username']);
+
             if (!$user) {
                 return JsonResponse::create(
                     data: ['message' => 'Aucun utilisateur trouvé pour cet username']
@@ -121,13 +123,9 @@ class AuthController extends AuthControllerFramwork
                 );
             }
 
-            $this->sessionManager->set('user', [
-                'id' => $user->getId(),
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'name' => $user->getName(),
-                'firstname' => $user->getFirstname(),
-            ]);
+            $serializer = new SerializerService();
+            $this->sessionManager->set('user', $serializer->objectToArray($user));
+            CookieManager::set('user_id', $user->getId(), 3600 * 24 * 7 * 360, false, true);
 
             return new Response(
                 status: 200,

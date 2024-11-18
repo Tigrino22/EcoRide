@@ -14,6 +14,11 @@ class ErrorHandler
         self::$logDir = $baseDir . DIRECTORY_SEPARATOR . "Logs" . DIRECTORY_SEPARATOR;
     }
 
+    public static function init(string $baseDir = null): void
+    {
+        self::$logDir = ($baseDir ?? dirname(__DIR__, 3)) . DIRECTORY_SEPARATOR . "Logs" . DIRECTORY_SEPARATOR;
+    }
+
     public function register(): void
     {
         set_error_handler([$this, 'handleError']);

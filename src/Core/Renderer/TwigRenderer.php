@@ -7,6 +7,7 @@ use Tigrino\Core\Renderer\Extensions\TwigCsrfExtension;
 use Tigrino\Core\Renderer\Extensions\TwigFlashExtension;
 use Tigrino\Core\Renderer\Extensions\TwigPathExtension;
 use Tigrino\Core\Renderer\Extensions\TwigSessionExtension;
+use Tigrino\Core\Renderer\Extensions\TwigUuidExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -33,6 +34,7 @@ class TwigRenderer implements RendererInterface
         $this->twig->addExtension($container->get(TwigSessionExtension::class));
         $this->twig->addExtension($container->get(TwigFlashExtension::class));
         $this->twig->addExtension($container->get(TwigCsrfExtension::class));
+        //$this->twig->addExtension($container->get(TwigUuidExtension::class));
     }
 
     /**
